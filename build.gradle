@@ -1,14 +1,27 @@
 buildscript {
+    ext {
+        appName = "platformer"
+        gdxVersion = '1.9.6'
+        roboVMVersion = '2.3.0'
+        box2DLightsVersion = '1.4'
+        aiVersion = '1.8.0'
+        artemisVersion = '2.1.0'
+        artemisEntityTrackerVersion = '0.4.0-SNAPSHOT'
+
+    }
+
     repositories {
         mavenLocal()
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
     }
+
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.android.tools.build:gradle:2.3.2'
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
         classpath 'org.multi-os-engine:moe-gradle:1.3.6'
+        classpath "net.onedaybeard.artemis:artemis-odb-gradle-plugin:$artemisVersion"
     }
 }
 
@@ -17,20 +30,35 @@ allprojects {
     apply plugin: "idea"
 
     version = '1.0'
-    ext {
-        appName = "platformer"
-        gdxVersion = '1.9.6'
-        roboVMVersion = '2.3.0'
-        box2DLightsVersion = '1.4'
-        ashleyVersion = '1.7.0'
-        aiVersion = '1.8.0'
-    }
 
     repositories {
         mavenLocal()
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+    }
+}
+
+subprojects {
+    apply plugin: "eclipse"
+    apply plugin: "idea"
+
+    configurations.all {
+        resolutionStrategy.force "net.onedaybeard.artemis:artemis-odb:$artemisVersion"
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        jcenter()
+    }
+
+    idea {
+        module {
+            downloadJavadoc = true
+            downloadSources = true
+        }
     }
 }
 
@@ -63,7 +91,6 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
@@ -97,9 +124,18 @@ project(":core") {
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
+        compile "net.onedaybeard.artemis:artemis-odb:$artemisVersion"
+        compile "net.namekdev.entity_tracker:artemis-entity-tracker:$artemisEntityTrackerVersion"
+        compile "net.namekdev.entity_tracker:artemis-entity-tracker-gui:$artemisEntityTrackerVersion"
+    }
+
+    idea {
+        module {
+            downloadJavadoc = true
+            downloadSources = true
+        }
     }
 }
 

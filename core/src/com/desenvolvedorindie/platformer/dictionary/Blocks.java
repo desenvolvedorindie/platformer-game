@@ -12,7 +12,7 @@ public class Blocks {
 
     public static final Block AIR;
 
-    public static final Block DIRTY;
+    public static final Block DIRT;
 
     public static final Block COBBLESTONE;
 
@@ -33,7 +33,7 @@ public class Blocks {
 
     static {
         AIR = register(AIR_ID, new Block(null));
-        DIRTY = register(1, new Block(new Texture("blocks/dirty.png")));
+        DIRT = register(1, new Block(new Texture("blocks/dirt.png")));
         COBBLESTONE = register(2, new Block(new Texture("blocks/cobblestone.png")));
         OBSIDIAN = register(3, new Block(new Texture("blocks/obsidian.png")));
     }
