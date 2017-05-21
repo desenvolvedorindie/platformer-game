@@ -36,7 +36,7 @@ public class PlatformerGame extends ApplicationAdapter {
 		camera.setToOrtho(false);
 		viewport = new FillViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
 
-		world = new World();
+		world = new World(camera);
 		world.regenerate();
 	}
 
@@ -45,9 +45,7 @@ public class PlatformerGame extends ApplicationAdapter {
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		batch.begin();
-		world.render(batch);
-		batch.end();
+		world.update(Gdx.graphics.getDeltaTime());
 	}
 
 	@Override

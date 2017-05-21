@@ -1,16 +1,41 @@
 package com.desenvolvedorindie.platformer.world;
 
+import com.artemis.WorldConfiguration;
+import com.artemis.WorldConfigurationBuilder;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.desenvolvedorindie.platformer.PlatformerGame;
 import com.desenvolvedorindie.platformer.block.Block;
 import com.desenvolvedorindie.platformer.dictionary.Blocks;
+import com.desenvolvedorindie.platformer.entity.EntitiesFactory;
+import com.desenvolvedorindie.platformer.entity.system.SpriteRenderSystem;
+import com.desenvolvedorindie.platformer.entity.system.TileRenderSystem;
+
+import net.namekdev.entity_tracker.EntityTracker;
+import net.namekdev.entity_tracker.ui.EntityTrackerMainWindow;
 
 public class World {
 
     private int[][][] map = new int[80][45][2];
 
-    public World() {
+    com.artemis.World world;
 
+    public World(OrthographicCamera camera) {
+        WorldConfigurationBuilder worldConfigBuilder = new WorldConfigurationBuilder()
+                .with(new TileRenderSystem(this, camera))
+                .with(new SpriteRenderSystem(camera));
+
+        if(PlatformerGame.DEBUG) {
+            worldConfigBuilder.with(new EntityTracker(new EntityTrackerMainWindow()));
+        }
+
+        WorldConfiguration config = worldConfigBuilder.build();
+
+        world = new com.artemis.World(config);
+
+        EntitiesFactory.createPlayer(world, 0, 0);
     }
 
     public void regenerate() {
@@ -29,37 +54,9 @@ public class World {
         }
     }
 
-    public void render(Batch batch) {
-        renderBackground(batch);
-        renderForeground(batch);
-    }
-
-    private void renderBackground(Batch batch) {
-        Texture texture = null;
-
-        for (int x = 0; x < getWidth(); x++) {
-            for (int y = 0; y < getHeight(); y++) {
-                texture = getBlock(x, y, 0).texture;
-
-                if (texture != null) {
-                    batch.draw(texture, x * Block.TILE_SIZE, y * Block.TILE_SIZE);
-                }
-            }
-        }
-    }
-
-    private void renderForeground(Batch batch) {
-        Texture texture = null;
-
-        for (int x = 0; x < getWidth(); x++) {
-            for (int y = 0; y < getHeight(); y++) {
-                texture = getBlock(x, y, 1).texture;
-
-                if (texture != null) {
-                    batch.draw(texture, x * Block.TILE_SIZE, y * Block.TILE_SIZE);
-                }
-            }
-        }
+    public void update(float delta) {
+        world.setDelta(delta);
+        world.process();
     }
 
     public Block getBlock(int x, int y, int layer) {
