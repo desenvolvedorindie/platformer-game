@@ -6,6 +6,7 @@ import com.artemis.World;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.desenvolvedorindie.platformer.entity.component.PlayerComponent;
+import com.desenvolvedorindie.platformer.entity.component.RigidBodyComponent;
 import com.desenvolvedorindie.platformer.entity.component.SpriteComponent;
 import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
 
@@ -29,6 +30,10 @@ public class EntitiesFactory {
         PlayerComponent cPlayer = new PlayerComponent();
 
         entityEdit.add(cPlayer);
+
+        RigidBodyComponent cRigidBody = new RigidBodyComponent();
+
+        entityEdit.add(cRigidBody);
 
         return entity;
     }
