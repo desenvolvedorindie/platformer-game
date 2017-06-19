@@ -9,6 +9,9 @@ public class PlatformerGame extends Game {
 
 	public static final boolean DEBUG = true;
 
+	public static final int SCREEN_WIDTH = 1280;
+	public static final int SCREEN_HEIGHT = 720;
+
 	private PlatformerGame() {
 	}
 

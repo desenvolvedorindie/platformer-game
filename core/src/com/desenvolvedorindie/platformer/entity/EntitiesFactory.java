@@ -1,6 +1,6 @@
 package com.desenvolvedorindie.platformer.entity;
 
-import com.artemis.Entity;
+import com.artemis.ComponentMapper;
 import com.artemis.EntityEdit;
 import com.artemis.World;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,28 +12,27 @@ import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
 
 public class EntitiesFactory {
 
-    public static Entity createPlayer(World world, float x, float y) {
-        Entity entity = world.createEntity();
+    private ComponentMapper<PlayerComponent> mPlayer;
 
-        EntityEdit entityEdit = entity.edit();
+    private ComponentMapper<RigidBodyComponent> mRigidBody;
 
-        TransformComponent cTransform = new TransformComponent();
+    private ComponentMapper<SpriteComponent> mSprite;
+
+    private ComponentMapper<TransformComponent> mTransform;
+
+
+    public int createPlayer(World world, float x, float y) {
+        int entity = world.create();
+
+        TransformComponent cTransform = mTransform.create(entity);
         cTransform.position.set(x, y);
 
-        entityEdit.add(cTransform);
-
-        SpriteComponent cSprite = new SpriteComponent();
+        SpriteComponent cSprite = mSprite.create(entity);
         cSprite.sprite = new Sprite(new Texture("player/player.png"));
 
-        entityEdit.add(cSprite);
+        PlayerComponent cPlayer = mPlayer.create(entity);
 
-        PlayerComponent cPlayer = new PlayerComponent();
-
-        entityEdit.add(cPlayer);
-
-        RigidBodyComponent cRigidBody = new RigidBodyComponent();
-
-        entityEdit.add(cRigidBody);
+        RigidBodyComponent cRigidBody = mRigidBody.create(entity);
 
         return entity;
     }

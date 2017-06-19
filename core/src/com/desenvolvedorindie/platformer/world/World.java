@@ -3,6 +3,8 @@ package com.desenvolvedorindie.platformer.world;
 import com.artemis.Entity;
 import com.artemis.WorldConfiguration;
 import com.artemis.WorldConfigurationBuilder;
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.desenvolvedorindie.platformer.PlatformerGame;
 import com.desenvolvedorindie.platformer.block.Block;
@@ -27,7 +29,9 @@ public class World {
 
     private float gravity = -576;
 
-    private Entity player;
+    private int player;
+
+    private EntitiesFactory entitiesFactory;
 
     public World(OrthographicCamera camera) {
         WorldConfigurationBuilder worldConfigBuilder = new WorldConfigurationBuilder()
@@ -36,15 +40,20 @@ public class World {
                 .with(new SpriteRenderSystem(camera));
 
         if(PlatformerGame.DEBUG) {
-            entityTrackerWindow = new EntityTrackerMainWindow(false, false);
-            worldConfigBuilder.with(new EntityTracker(entityTrackerWindow));
+            if (Gdx.app.getType().equals(Application.ApplicationType.Desktop)) {
+                entityTrackerWindow = new EntityTrackerMainWindow(false, false);
+                worldConfigBuilder.with(new EntityTracker(entityTrackerWindow));
+            }
         }
 
         WorldConfiguration config = worldConfigBuilder.build();
 
         world = new com.artemis.World(config);
 
-        player = EntitiesFactory.createPlayer(world, 0, getHeight() * Block.TILE_SIZE);
+        entitiesFactory = new EntitiesFactory();
+        world.inject(entitiesFactory);
+
+        player = entitiesFactory.createPlayer(world, 0, getHeight() * Block.TILE_SIZE);
     }
 
     public void regenerate() {
@@ -100,7 +109,12 @@ public class World {
         return gravity;
     }
 
-    public Entity getPlayer() {
+    public int getPlayer() {
         return player;
     }
+
+    public com.artemis.World getWorld() {
+        return world;
+    }
+
 }
