@@ -33,23 +33,6 @@ public class GameScreen extends ScreenAdapter {
 
         world = new World(camera);
         world.regenerate();
-
-        if (PlatformerGame.DEBUG) {
-            Gdx.input.setInputProcessor(new InputAdapter() {
-                @Override
-                public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                    screenCoordinate.set(screenX, screenY, 0);
-                    camera.unproject(screenCoordinate);
-
-                    int player = world.getPlayer();
-
-                    world.getWorld().getEntity(player).getComponent(TransformComponent.class).position.set(screenCoordinate.x, screenCoordinate.y);
-                    world.getWorld().getEntity(player).getComponent(RigidBodyComponent.class).velocity.set(0, 0);
-
-                    return true;
-                }
-            });
-        }
     }
 
     @Override

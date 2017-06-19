@@ -11,6 +11,7 @@ import com.desenvolvedorindie.platformer.block.Block;
 import com.desenvolvedorindie.platformer.dictionary.Blocks;
 import com.desenvolvedorindie.platformer.entity.EntitiesFactory;
 import com.desenvolvedorindie.platformer.entity.system.MovementSystem;
+import com.desenvolvedorindie.platformer.entity.system.PlayerControllerSystem;
 import com.desenvolvedorindie.platformer.entity.system.SpriteRenderSystem;
 import com.desenvolvedorindie.platformer.entity.system.TileRenderSystem;
 
@@ -35,6 +36,7 @@ public class World {
 
     public World(OrthographicCamera camera) {
         WorldConfigurationBuilder worldConfigBuilder = new WorldConfigurationBuilder()
+                .with(new PlayerControllerSystem())
                 .with(new MovementSystem(this))
                 .with(new TileRenderSystem(this, camera))
                 .with(new SpriteRenderSystem(camera));
