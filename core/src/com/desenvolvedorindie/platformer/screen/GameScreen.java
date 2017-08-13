@@ -2,27 +2,29 @@ package com.desenvolvedorindie.platformer.screen;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.viewport.FillViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.math.collision.BoundingBox;
+import com.desenvolvedorindie.gdxcamera.constraint.*;
 import com.desenvolvedorindie.platformer.PlatformerGame;
+import com.desenvolvedorindie.platformer.block.Block;
+import com.desenvolvedorindie.platformer.entity.component.CollidableComponent;
 import com.desenvolvedorindie.platformer.entity.component.RigidBodyComponent;
 import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
 import com.desenvolvedorindie.platformer.world.World;
 
+import static com.badlogic.gdx.Input.*;
+
 public class GameScreen extends ScreenAdapter {
 
-    protected OrthographicCamera camera;
-    protected World world;
-    SpriteBatch batch;
-
-    protected final Vector3 screenCoordinate = new Vector3();
+    private World world;
+    private SpriteBatch batch;
+    private OrthographicCamera camera;
 
     @Override
     public void show() {
@@ -33,6 +35,7 @@ public class GameScreen extends ScreenAdapter {
 
         world = new World(camera);
         world.regenerate();
+        //world.generateTilesBodies();
     }
 
     @Override
@@ -41,21 +44,11 @@ public class GameScreen extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         world.update(delta);
-
-        if (PlatformerGame.DEBUG) {
-            if (Gdx.app.getType().equals(Application.ApplicationType.Desktop)) {
-                if (Gdx.input.isKeyJustPressed(Input.Keys.B)) {
-                    if (world.getEntityTrackerWindow() != null) {
-                        world.getEntityTrackerWindow().setVisible(!world.getEntityTrackerWindow().isVisible());
-                    }
-                }
-            }
-        }
     }
 
     @Override
     public void resize(int width, int height) {
-
+        batch.setProjectionMatrix(camera.combined);
     }
 
     @Override

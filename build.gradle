@@ -7,7 +7,7 @@ buildscript {
         aiVersion = '1.8.1'
         artemisVersion = '2.1.0'
         artemisEntityTrackerVersion = '0.4.0-SNAPSHOT'
-
+        gdxUtilsVersion = '0.13.4'
     }
 
     repositories {
@@ -36,16 +36,18 @@ allprojects {
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+        maven { url "https://jitpack.io" }
+        maven { url "http://dl.bintray.com/spookygames/oss/" }
+    }
+
+    configurations.all {
+        resolutionStrategy.force "net.onedaybeard.artemis:artemis-odb:$artemisVersion", "org.objenesis:objenesis:2.5"
     }
 }
 
 subprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
-
-    configurations.all {
-        resolutionStrategy.force "net.onedaybeard.artemis:artemis-odb:$artemisVersion"
-    }
 
     repositories {
         mavenLocal()
@@ -70,6 +72,7 @@ project(":desktop") {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
@@ -77,10 +80,27 @@ project(":desktop") {
     }
 }
 
+project(":bte") {
+    apply plugin: "java"
+
+
+    dependencies {
+        compile project(":core")
+        compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        compile 'com.github.piotr-j.bte2:bte:master-SNAPSHOT'
+        compile 'com.github.piotr-j.bte2:bte-window:master-SNAPSHOT'
+    }
+}
+
+/*
 project(":android") {
     apply plugin: "android"
 
-    configurations { natives }
+    configurations {
+        natives
+        pd
+    }
 
     dependencies {
         compile project(":core")
@@ -90,6 +110,13 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+        compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi"
+        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi-v7a"
+        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a"
+        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
+        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64"
+        compile "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi"
@@ -101,11 +128,11 @@ project(":android") {
         compile "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
     }
 }
+*/
 
 project(":ios") {
     apply plugin: "java"
     apply plugin: "robovm"
-
 
     dependencies {
         compile project(":core")
@@ -113,6 +140,7 @@ project(":ios") {
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
         compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
+        compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-ios"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
     }
 }
@@ -120,15 +148,27 @@ project(":ios") {
 project(":core") {
     apply plugin: "java"
 
-
     dependencies {
+        compile fileTree(include: ['*.jar'], dir: 'libs')
+
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
         compile "net.onedaybeard.artemis:artemis-odb:$artemisVersion"
         compile "net.namekdev.entity_tracker:artemis-entity-tracker:$artemisEntityTrackerVersion"
         compile "net.namekdev.entity_tracker:artemis-entity-tracker-gui:$artemisEntityTrackerVersion"
+        compile "net.dermetfan.libgdx-utils:libgdx-utils:$gdxUtilsVersion"
+        compile "net.dermetfan.libgdx-utils:libgdx-utils-box2d:$gdxUtilsVersion"
+        compile "com.github.FEOMedia:artemis-odb-orion:-SNAPSHOT"
+        compile "net.spookygames.gdx:gdx-spriter:0.1.3"
+        compile "net.spookygames.gdx:gdx-gfx:0.0.3"
+
+        compile "com.github.desenvolvedorindie:gdx-cameras:0.0.2"
+
+        testCompile 'junit:junit:4.12'
+        testCompile 'org.mockito:mockito-core:2.+'
     }
 
     idea {
@@ -148,6 +188,7 @@ project(":ios-moe") {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-moe:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
+        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-ios"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
     }
 }

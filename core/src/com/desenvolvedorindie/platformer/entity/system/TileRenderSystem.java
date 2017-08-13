@@ -1,6 +1,7 @@
 package com.desenvolvedorindie.platformer.entity.system;
 
 import com.artemis.BaseSystem;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -16,6 +17,8 @@ public class TileRenderSystem extends BaseSystem {
 
     private SpriteBatch batch;
 
+    private Color tileColor = new Color();
+
     public TileRenderSystem(World world, OrthographicCamera camera) {
         this.world = world;
         this.camera = camera;
@@ -30,7 +33,12 @@ public class TileRenderSystem extends BaseSystem {
 
     @Override
     protected void processSystem() {
+        tileColor.set(0xCCCCCCff);
+        batch.setColor(tileColor);
         renderBackground(batch);
+
+        tileColor.set(Color.WHITE);
+        batch.setColor(Color.WHITE);
         renderForeground(batch);
     }
 
@@ -47,7 +55,7 @@ public class TileRenderSystem extends BaseSystem {
                 texture = world.getBlock(x, y, 0).texture;
 
                 if (texture != null) {
-                    batch.draw(texture, x * Block.TILE_SIZE, y * Block.TILE_SIZE);
+                    batch.draw(texture, World.mapToWorld(x), World.mapToWorld(y));
                 }
             }
         }
@@ -61,7 +69,7 @@ public class TileRenderSystem extends BaseSystem {
                 texture = world.getBlock(x, y, 1).texture;
 
                 if (texture != null) {
-                    batch.draw(texture, x * Block.TILE_SIZE, y * Block.TILE_SIZE);
+                    batch.draw(texture, World.mapToWorld(x)/* / PPM*/, World.mapToWorld(y)/* / PPM*/, Block.TILE_SIZE/* / PPM*/, Block.TILE_SIZE/* / PPM*/);
                 }
             }
         }

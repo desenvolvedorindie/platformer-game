@@ -7,6 +7,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.math.Vector2;
+import com.desenvolvedorindie.platformer.entity.component.Box2dRigidBodyComponent;
 import com.desenvolvedorindie.platformer.entity.component.CollidableComponent;
 import com.desenvolvedorindie.platformer.entity.component.JumpComponent;
 import com.desenvolvedorindie.platformer.entity.component.PlayerComponent;
@@ -15,6 +17,8 @@ import com.desenvolvedorindie.platformer.entity.component.RigidBodyComponent;
 public class PlayerControllerSystem extends IteratingSystem {
 
     private ComponentMapper<PlayerComponent> mPlayer;
+
+    private ComponentMapper<Box2dRigidBodyComponent> mBox2dRigidBody;
 
     private ComponentMapper<RigidBodyComponent> mRigidBody;
 
@@ -29,7 +33,7 @@ public class PlayerControllerSystem extends IteratingSystem {
     private boolean jump;
 
     public PlayerControllerSystem() {
-        super(Aspect.all(PlayerComponent.class, RigidBodyComponent.class, JumpComponent.class, CollidableComponent.class));
+        super(Aspect.all(PlayerComponent.class, Box2dRigidBodyComponent.class, JumpComponent.class));
 
         Gdx.input.setInputProcessor(new InputMultiplexer(new GameInputAdapter()));
     }
@@ -37,9 +41,13 @@ public class PlayerControllerSystem extends IteratingSystem {
     @Override
     protected void process(int entityId) {
         PlayerComponent cPlayer = mPlayer.get(entityId);
+        Box2dRigidBodyComponent cBox2DRigidBody = mBox2dRigidBody.get(entityId);
         RigidBodyComponent cRigidBody = mRigidBody.get(entityId);
         JumpComponent cJump = mJump.get(entityId);
         CollidableComponent cCollidable = mCollidable.get(entityId);
+
+        Vector2 vel = cBox2DRigidBody.body.getLinearVelocity();
+        Vector2 pos = cBox2DRigidBody.body.getPosition();
 
         if (cPlayer.canWalk) {
             if (moveRight == moveLeft) {
@@ -51,8 +59,14 @@ public class PlayerControllerSystem extends IteratingSystem {
             }
         }
 
-        if(cJump.canJump && cCollidable.onGround && jump) {
-            cRigidBody.velocity.y = cJump.jumpSpeed;
+        if (cJump.canJump && jump) {
+            if (mCollidable.has(entityId)) {
+                if (cCollidable.onGround) {
+                    cRigidBody.velocity.y = cJump.jumpSpeed;
+                }
+            } else {
+                cRigidBody.velocity.y = cJump.jumpSpeed;
+            }
         }
     }
 

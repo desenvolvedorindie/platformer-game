@@ -1,8 +1,9 @@
 package com.desenvolvedorindie.platformer.dictionary;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.IntMap;
 import com.desenvolvedorindie.platformer.block.Block;
+import com.desenvolvedorindie.platformer.block.BlockAir;
+import com.desenvolvedorindie.platformer.resource.Assets;
 
 public class Blocks {
 
@@ -32,10 +33,10 @@ public class Blocks {
     }
 
     static {
-        AIR = register(AIR_ID, new Block(null));
-        DIRT = register(1, new Block(new Texture("blocks/dirt.png")));
-        COBBLESTONE = register(2, new Block(new Texture("blocks/cobblestone.png")));
-        OBSIDIAN = register(3, new Block(new Texture("blocks/obsidian.png")));
+        AIR = register(AIR_ID, new BlockAir());
+        DIRT = register(1, new Block(Assets.manager.get(Assets.dirt)));
+        COBBLESTONE = register(2, new Block(Assets.manager.get(Assets.cobblestone)));
+        OBSIDIAN = register(3, new Block(Assets.manager.get(Assets.obsidian)));
     }
 
 }
