@@ -10,5 +10,7 @@ public class PlayerComponent extends Component {
 
     public float walkSpeed = 100;
 
+    public boolean godMode;
+
 
 }

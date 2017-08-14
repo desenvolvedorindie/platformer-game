@@ -51,7 +51,9 @@ public class SpriterAnimationRenderSystem extends IteratingSystem {
 
         spriterAnimation.update(world.getDelta());
 
+        batch.setShader(cSpriterAnimation.shader);
         spriterAnimation.draw(batch);
+        batch.setShader(null);
     }
 
     @Override

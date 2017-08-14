@@ -7,4 +7,5 @@ public class RigidBodyComponent extends Component {
 
     public final Vector2 velocity = new Vector2();
 
+    public float gravityMultiplier = 1;
 }

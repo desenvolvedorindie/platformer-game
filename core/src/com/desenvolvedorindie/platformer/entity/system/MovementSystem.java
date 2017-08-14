@@ -46,7 +46,7 @@ public class MovementSystem extends IteratingSystem {
         cCollidable.onRightWall = false;
         cCollidable.onLeftWall = false;
 
-        cRigidBody.velocity.y += world.getGravity() * delta;
+        cRigidBody.velocity.y += world.getGravity() * cRigidBody.gravityMultiplier * delta;
 
         Vector2 velocity = new Vector2(cRigidBody.velocity);
 

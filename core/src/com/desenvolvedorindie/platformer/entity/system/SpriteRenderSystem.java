@@ -50,6 +50,8 @@ public class SpriteRenderSystem extends IteratingSystem {
 
         sprite.setPosition(cTransform.position.x, cTransform.position.y);
 
+        batch.setShader(cSprite.shader);
+
         batch.draw(
                 sprite.getTexture(),
                 sprite.getX() - sprite.getOriginX(),
@@ -68,6 +70,8 @@ public class SpriteRenderSystem extends IteratingSystem {
                 cSprite.flipX,
                 cSprite.flipY
         );
+
+        batch.setShader(null);
     }
 
     @Override

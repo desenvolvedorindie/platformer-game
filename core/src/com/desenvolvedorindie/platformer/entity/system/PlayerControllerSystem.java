@@ -8,11 +8,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.math.Vector2;
-import com.desenvolvedorindie.platformer.entity.component.Box2dRigidBodyComponent;
-import com.desenvolvedorindie.platformer.entity.component.CollidableComponent;
-import com.desenvolvedorindie.platformer.entity.component.JumpComponent;
-import com.desenvolvedorindie.platformer.entity.component.PlayerComponent;
-import com.desenvolvedorindie.platformer.entity.component.RigidBodyComponent;
+import com.desenvolvedorindie.platformer.entity.component.*;
 
 public class PlayerControllerSystem extends IteratingSystem {
 
@@ -59,9 +55,12 @@ public class PlayerControllerSystem extends IteratingSystem {
             }
         }
 
+
         if (cJump.canJump && jump) {
             if (mCollidable.has(entityId)) {
-                if (cCollidable.onGround) {
+                boolean wallJump = (cCollidable.onLeftWall || cCollidable.onRightWall) && cRigidBody.velocity.y < 0;
+
+                if (cCollidable.onGround || wallJump) {
                     cRigidBody.velocity.y = cJump.jumpSpeed;
                 }
             } else {
