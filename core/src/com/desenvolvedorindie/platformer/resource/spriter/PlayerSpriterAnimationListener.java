@@ -1,7 +1,5 @@
 package com.desenvolvedorindie.platformer.resource.spriter;
 
-import com.badlogic.gdx.Gdx;
-
 import net.spookygames.gdx.spriter.SpriterAnimationAdapter;
 import net.spookygames.gdx.spriter.SpriterAnimator;
 import net.spookygames.gdx.spriter.data.SpriterAnimation;

@@ -19,10 +19,10 @@ public class SpriteRenderSystem extends IteratingSystem {
 
     private SpriteBatch batch;
 
-    public SpriteRenderSystem(OrthographicCamera camera) {
+    public SpriteRenderSystem(OrthographicCamera camera, SpriteBatch batch) {
         super(Aspect.all(TransformComponent.class, SpriteComponent.class));
         this.camera = camera;
-        batch = new SpriteBatch();
+        this.batch = batch;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class SpriteRenderSystem extends IteratingSystem {
 
         Sprite sprite = cSprite.sprite;
 
-        if(cTransform.originCenter) {
+        if (cTransform.originCenter) {
             sprite.setOriginCenter();
         } else {
             sprite.setOrigin(cTransform.origin.x, cTransform.origin.y);

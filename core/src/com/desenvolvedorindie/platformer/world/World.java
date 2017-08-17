@@ -8,24 +8,26 @@ import com.artemis.managers.TagManager;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import com.desenvolvedorindie.platformer.PlatformerGame;
 import com.desenvolvedorindie.platformer.block.Block;
+import com.desenvolvedorindie.platformer.block.water.Grid;
 import com.desenvolvedorindie.platformer.dictionary.Blocks;
 import com.desenvolvedorindie.platformer.entity.EntitiesFactory;
 import com.desenvolvedorindie.platformer.entity.system.*;
-
 import net.namekdev.entity_tracker.EntityTracker;
 import net.namekdev.entity_tracker.ui.EntityTrackerMainWindow;
+import se.feomedia.orion.system.OperationSystem;
 
 import java.util.Random;
 
-import se.feomedia.orion.system.OperationSystem;
-
-import static com.artemis.WorldConfigurationBuilder.*;
+import static com.artemis.WorldConfigurationBuilder.Priority;
+import static com.desenvolvedorindie.platformer.block.water.Cell.CellType;
 
 public class World {
 
@@ -33,11 +35,11 @@ public class World {
 
     private int[][][] map = new int[80][45][2];
 
+    private Grid water = new Grid(80, 45);
+
     private Body[][] tilesBodies = new Body[80][45];
 
     private com.artemis.World artemis;
-
-    private com.badlogic.gdx.physics.box2d.World box2d;
 
     private int seaLevel = 7;
 
@@ -47,7 +49,7 @@ public class World {
 
     private EntitiesFactory entitiesFactory;
 
-    public World(OrthographicCamera camera) {
+    public World(OrthographicCamera camera, SpriteBatch batch, ShapeRenderer shapeRenderer) {
         WorldConfigurationBuilder worldConfigBuilder = new WorldConfigurationBuilder()
                 .with(Priority.HIGH,
                         new GroupManager(),
@@ -60,26 +62,24 @@ public class World {
                         new DayNightCycleSystem()
                 )
                 .with(Priority.LOW,
-                        new TileRenderSystem(this, camera),
-                        new SpriteRenderSystem(camera),
-                        new SpriterAnimationRenderSystem(camera),
-                        new CameraSystem(this, camera)
+                        new TileRenderSystem(this, camera, batch),
+                        new SpriteRenderSystem(camera, batch),
+                        new SpriterAnimationRenderSystem(camera, batch),
+                        new WaterSystem(this, camera, shapeRenderer)
+                        //new CameraSystem(this, camera)
                 );
 
-        box2d = new com.badlogic.gdx.physics.box2d.World(new Vector2(0, gravity), true);
-
-        if(PlatformerGame.DEBUG) {
-            //worldConfigBuilder.with(new Box2dDebugRenderSystem(box2d, camera));
-
+        if (PlatformerGame.DEBUG) {
             worldConfigBuilder.with(
                     Priority.LOW,
-                    new CollisionDebugSystem(this, camera),
+                    new CollisionDebugSystem(this, camera, shapeRenderer),
                     new DebugSystem(this, camera)
             );
 
             if (Gdx.app.getType().equals(Application.ApplicationType.Desktop)) {
-                entityTrackerWindow = new EntityTrackerMainWindow(false, false);
-                worldConfigBuilder.with(new EntityTracker(entityTrackerWindow));
+                worldConfigBuilder.with(Priority.LOW,
+                        new EntityTracker(entityTrackerWindow = new EntityTrackerMainWindow(false, false))
+                );
             }
         }
 
@@ -90,9 +90,15 @@ public class World {
         entitiesFactory = new EntitiesFactory();
         artemis.inject(entitiesFactory);
 
-        player = entitiesFactory.createPlayer(artemis, box2d, 200, mapToWorld(getHeight() - 3));
+        player = entitiesFactory.createPlayer(artemis, 200, mapToWorld(getHeight() - 3));
+    }
 
-        box2d.setContactListener(new WorldContactListener());
+    public static float mapToWorld(int mapCoordinate) {
+        return mapCoordinate * Block.TILE_SIZE;
+    }
+
+    public static int worldToMap(float worldCoordinate) {
+        return (int) (worldCoordinate / Block.TILE_SIZE);
     }
 
     public void regenerate() {
@@ -113,27 +119,22 @@ public class World {
                         if (l == 0) {
                             block = Blocks.DIRT;
                         } else {
-                            block = random.nextInt(100) > 90 ? Blocks.DIRT : Blocks.AIR;
+                            block = random.nextInt(100) > 95 ? Blocks.DIRT : Blocks.AIR;
                         }
                     }
 
                     map[x][y][l] = Blocks.getIdByBlock(block);
                 }
-            }
-        }
-    }
 
-    public void generateTilesBodies() {
-        for (int x = 0; x < getWidth(); x++) {
-            for (int y = 0; y < getHeight(); y++) {
-                tilesBodies[x][y] = Blocks.getBlockById(map[x][y][1]).createBody(box2d, x, y);
+                if (isSolid(x, y)) {
+                    water.getCell(x, y).setType(CellType.SOLID);
+                }
             }
         }
     }
 
     public void update(float delta) {
-        //box2d.step(1 / 60f, 6, 2);
-        artemis.setDelta(delta);
+        artemis.setDelta(Math.min(delta, 1 / (float) Gdx.graphics.getFramesPerSecond()));
         artemis.process();
     }
 
@@ -175,7 +176,6 @@ public class World {
 
     public void dispose() {
         artemis.dispose();
-        box2d.dispose();
     }
 
     public void getTilesRectangle(float startX, float startY, float endX, float endY, Array<Rectangle> tiles) {
@@ -238,12 +238,7 @@ public class World {
         return artemis;
     }
 
-    public static float mapToWorld(int mapCoordinate) {
-        return mapCoordinate * Block.TILE_SIZE;
+    public Grid getWater() {
+        return water;
     }
-
-    public static int worldToMap(float worldCoordinate) {
-        return (int) (worldCoordinate / Block.TILE_SIZE);
-    }
-
 }

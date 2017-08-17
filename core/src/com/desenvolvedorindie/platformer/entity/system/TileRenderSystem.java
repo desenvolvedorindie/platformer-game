@@ -19,10 +19,10 @@ public class TileRenderSystem extends BaseSystem {
 
     private Color tileColor = new Color();
 
-    public TileRenderSystem(World world, OrthographicCamera camera) {
+    public TileRenderSystem(World world, OrthographicCamera camera, SpriteBatch batch) {
         this.world = world;
         this.camera = camera;
-        this.batch = new SpriteBatch();
+        this.batch = batch;
     }
 
     @Override

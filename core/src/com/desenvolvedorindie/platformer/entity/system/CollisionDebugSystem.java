@@ -29,11 +29,11 @@ public class CollisionDebugSystem extends IteratingSystem {
 
     private ShapeRenderer shapeRenderer;
 
-    public CollisionDebugSystem(World world, Camera camera) {
+    public CollisionDebugSystem(World world, Camera camera, ShapeRenderer shapeRenderer) {
         super(Aspect.all(TransformComponent.class, RigidBodyComponent.class, CollidableComponent.class));
         this.gameWorld = world;
         this.camera = camera;
-        shapeRenderer = new ShapeRenderer();
+        this.shapeRenderer = shapeRenderer;
     }
 
     @Override

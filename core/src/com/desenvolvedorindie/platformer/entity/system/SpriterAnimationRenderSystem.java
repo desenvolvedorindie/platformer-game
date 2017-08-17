@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.desenvolvedorindie.platformer.entity.component.SpriterAnimationComponent;
 import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
-
 import net.spookygames.gdx.spriter.SpriterAnimator;
 
 public class SpriterAnimationRenderSystem extends IteratingSystem {
@@ -20,10 +19,10 @@ public class SpriterAnimationRenderSystem extends IteratingSystem {
 
     private SpriteBatch batch;
 
-    public SpriterAnimationRenderSystem(OrthographicCamera camera) {
+    public SpriterAnimationRenderSystem(OrthographicCamera camera, SpriteBatch batch) {
         super(Aspect.all(TransformComponent.class, SpriterAnimationComponent.class));
         this.camera = camera;
-        batch = new SpriteBatch();
+        this.batch = batch;
     }
 
     @Override

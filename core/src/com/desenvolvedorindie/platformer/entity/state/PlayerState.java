@@ -2,7 +2,6 @@ package com.desenvolvedorindie.platformer.entity.state;
 
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.desenvolvedorindie.platformer.entity.component.*;
@@ -128,7 +127,6 @@ public enum PlayerState implements State<Entity> {
 
     protected void init(Entity entity) {
         if (!alreadyInit) {
-            Gdx.app.log("PlayerState", "Init");
             entity.getWorld().inject(this);
             alreadyInit = true;
         }
