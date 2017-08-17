@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.desenvolvedorindie.platformer.graphics.FPSLogger;
+import com.desenvolvedorindie.platformer.resource.Assets;
 import com.desenvolvedorindie.platformer.screen.PreloadScreen;
 
 public class PlatformerGame extends Game {
@@ -53,5 +54,8 @@ public class PlatformerGame extends Game {
         }
     }
 
-
+    @Override
+    public void dispose() {
+        Assets.manager.dispose();
+    }
 }

@@ -7,12 +7,12 @@ import com.artemis.managers.PlayerManager;
 import com.artemis.managers.TagManager;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import com.desenvolvedorindie.platformer.PlatformerGame;
 import com.desenvolvedorindie.platformer.block.Block;
@@ -37,8 +37,6 @@ public class World {
 
     private Grid water = new Grid(80, 45);
 
-    private Body[][] tilesBodies = new Body[80][45];
-
     private com.artemis.World artemis;
 
     private int seaLevel = 7;
@@ -47,7 +45,13 @@ public class World {
 
     private int player;
 
+    private boolean debug;
+
     private EntitiesFactory entitiesFactory;
+
+    private CameraSystem cameraSystem;
+
+    private CollisionDebugSystem collisionDebugSystem;
 
     public World(OrthographicCamera camera, SpriteBatch batch, ShapeRenderer shapeRenderer) {
         WorldConfigurationBuilder worldConfigBuilder = new WorldConfigurationBuilder()
@@ -57,7 +61,7 @@ public class World {
                         new TagManager(),
                         new PlayerControllerSystem(),
                         new MovementSystem(this, camera),
-                        new StateUpdateSystem(),
+                        new StateSystem(),
                         new OperationSystem(),
                         new DayNightCycleSystem()
                 )
@@ -65,14 +69,14 @@ public class World {
                         new TileRenderSystem(this, camera, batch),
                         new SpriteRenderSystem(camera, batch),
                         new SpriterAnimationRenderSystem(camera, batch),
-                        new WaterSystem(this, camera, shapeRenderer)
-                        //new CameraSystem(this, camera)
+                        new WaterSystem(this, camera, shapeRenderer),
+                        cameraSystem = new CameraSystem(this, camera, shapeRenderer)
                 );
 
         if (PlatformerGame.DEBUG) {
             worldConfigBuilder.with(
                     Priority.LOW,
-                    new CollisionDebugSystem(this, camera, shapeRenderer),
+                    collisionDebugSystem = new CollisionDebugSystem(this, camera, shapeRenderer),
                     new DebugSystem(this, camera)
             );
 
@@ -136,6 +140,20 @@ public class World {
     public void update(float delta) {
         artemis.setDelta(Math.min(delta, 1 / (float) Gdx.graphics.getFramesPerSecond()));
         artemis.process();
+
+        if (PlatformerGame.DEBUG) {
+            debug();
+        }
+    }
+
+    private void debug() {
+        if(Gdx.input.isKeyJustPressed(Input.Keys.F11)) {
+            cameraSystem.setDebug(!cameraSystem.isDebug());
+        }
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.F12)) {
+            collisionDebugSystem.setEnabled(!collisionDebugSystem.isEnabled());
+        }
     }
 
     public Block getBlock(int x, int y, int layer) {

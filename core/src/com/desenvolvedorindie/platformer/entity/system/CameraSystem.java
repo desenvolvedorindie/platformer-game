@@ -25,8 +25,10 @@ public class CameraSystem extends BaseSystem {
             3,
     };
     private final Vector3 playerPositionV3 = new Vector3();
+
     private ComponentMapper<CollidableComponent> mCollidable;
     private ComponentMapper<TransformComponent> mTransform;
+
     private World gameWorld;
     private Camera camera;
     private ShapeRenderer shapeRenderer;
@@ -34,12 +36,11 @@ public class CameraSystem extends BaseSystem {
     private CameraFollowConstraint cameraFollow;
     private CameraConstraintBoundingBox cameraConstraintBoundBox;
     private CameraConstraint cameraConstraint;
+    private boolean debug;
 
-    public CameraSystem(World world, Camera camera) {
+    public CameraSystem(World world, Camera camera, ShapeRenderer shapeRenderer) {
         this.gameWorld = world;
         this.camera = camera;
-
-        shapeRenderer = new ShapeRenderer();
 
         cameraZoom = new CameraZoom(ZOOM_LEVELS, 1f);
 
@@ -60,7 +61,6 @@ public class CameraSystem extends BaseSystem {
                 cameraZoom.zoomOut();
             } else {
                 cameraZoom.zoomIn();
-
             }
         }
 
@@ -71,9 +71,16 @@ public class CameraSystem extends BaseSystem {
         playerPositionV3.set(cTransform.position.x + rectangle.width / 2, cTransform.position.y + rectangle.height, 0);
         cameraConstraint.update(camera, delta);
 
-        if (PlatformerGame.DEBUG) {
+        if (isDebug()) {
             cameraConstraint.debug(camera, shapeRenderer, delta);
         }
     }
 
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
 }

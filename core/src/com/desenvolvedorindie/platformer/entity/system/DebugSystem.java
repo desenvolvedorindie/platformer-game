@@ -48,12 +48,6 @@ public class DebugSystem extends BaseSystem {
 
             cTransform.position.set(screenCoordinate.x, screenCoordinate.y);
             cRigidBody.velocity.set(Vector2.Zero);
-
-            /*
-            Body body = world.getArtemis().getEntity(world.getPlayer()).getComponent(Box2dRigidBodyComponent.class).body;
-            body.setTransform(screenCoordinate.x, screenCoordinate.y, body.getAngle());
-            body.setLinearVelocity(0, 0);
-            */
         }
     }
 }

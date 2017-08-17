@@ -1,9 +1,13 @@
 package com.desenvolvedorindie.platformer.entity;
 
 import com.artemis.ComponentMapper;
+import com.artemis.Entity;
 import com.artemis.World;
+import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 import com.desenvolvedorindie.platformer.entity.component.*;
+import com.desenvolvedorindie.platformer.entity.state.PlayerState;
 import com.desenvolvedorindie.platformer.resource.Assets;
 import com.desenvolvedorindie.platformer.resource.spriter.PlayerSpriterAnimationListener;
 import net.spookygames.gdx.spriter.SpriterAnimator;
@@ -37,10 +41,6 @@ public class EntitiesFactory {
         int width = texture.getWidth();
         int height = texture.getHeight();
 
-        /*
-        SpriteComponent cSprite = mSprite.create(entity);
-        cSprite.sprite = new Sprite(texture);
-        */
         SpriterAnimationComponent cSpriterAnimation = mSpriterAnimationComponent.create(entity);
         cSpriterAnimation.spriterAnimator = new SpriterAnimator(Assets.manager.get(Assets.grayGuy).entities.first());
         cSpriterAnimation.spriterAnimator.play("idle");
@@ -49,20 +49,16 @@ public class EntitiesFactory {
 
         PlayerComponent cPlayer = mPlayer.create(entity);
 
-        /*
         StateComponent cState = mState.create(entity);
         cState.state = new DefaultStateMachine<Entity, PlayerState>(world.getEntity(entity), PlayerState.Idle);
-        */
 
         JumpComponent cJump = mJump.create(entity);
 
         final RigidBodyComponent cRigidBody = mRigiBody.create(entity);
 
-        /*
         CollidableComponent cCollidable = mCollidableComponent.create(entity);
         cCollidable.collisionBox.setPosition(new Vector2(x, y));
         cCollidable.collisionBox.setSize(width, height);
-        */
 
         cSpriterAnimation.spriterAnimator.addAnimationListener(new PlayerSpriterAnimationListener());
 

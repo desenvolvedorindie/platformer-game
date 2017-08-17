@@ -5,11 +5,11 @@ import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
 import com.desenvolvedorindie.platformer.entity.component.StateComponent;
 
-public class StateUpdateSystem extends IteratingSystem {
+public class StateSystem extends IteratingSystem {
 
     private ComponentMapper<StateComponent> mState;
 
-    public StateUpdateSystem() {
+    public StateSystem() {
         super(Aspect.all(StateComponent.class));
     }
 

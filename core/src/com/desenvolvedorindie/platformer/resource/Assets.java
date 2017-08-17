@@ -56,8 +56,4 @@ public class Assets {
         Gdx.app.log("EMBOSS", manager.get(EMBOSS).isCompiled() ? "Compiled" : manager.get(EMBOSS).getLog());
     }
 
-    public static void dispose() {
-
-    }
-
 }
