@@ -10,18 +10,15 @@ import com.desenvolvedorindie.platformer.screen.PreloadScreen;
 
 public class PlatformerGame extends Game {
 
-    private static PlatformerGame instance;
-
     public static final boolean DEBUG = true;
-
     public static final int SCREEN_WIDTH = 1280;
     public static final int SCREEN_HEIGHT = 720;
+    private static PlatformerGame instance;
+    private FPSLogger fps;
 
     private PlatformerGame() {
         Box2D.init();
     }
-
-    private FPSLogger fps;
 
     public static PlatformerGame getInstance() {
         if (instance == null) {
@@ -44,12 +41,12 @@ public class PlatformerGame extends Game {
         super.render();
 
         if (DEBUG) {
+            fps.log();
+
             if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
                 if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                     getScreen().show();
                 }
-
-                fps.log();
             }
         }
     }

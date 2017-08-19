@@ -1,0 +1,195 @@
+
+ui.png
+size: 1024,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+actionbar
+  rotate: false
+  xy: 681, 225
+  size: 301, 31
+  orig: 301, 31
+  offset: 0, 0
+  index: -1
+button_close_down
+  rotate: false
+  xy: 979, 152
+  size: 26, 26
+  orig: 26, 26
+  offset: 0, 0
+  index: -1
+button_close_up
+  rotate: false
+  xy: 979, 126
+  size: 26, 26
+  orig: 26, 26
+  offset: 0, 0
+  index: -1
+button_down
+  rotate: false
+  xy: 0, 48
+  size: 130, 26
+  orig: 130, 26
+  offset: 0, 0
+  index: -1
+button_invetory_down
+  rotate: false
+  xy: 979, 100
+  size: 26, 26
+  orig: 26, 26
+  offset: 0, 0
+  index: -1
+button_invetory_up
+  rotate: false
+  xy: 220, 68
+  size: 26, 26
+  orig: 26, 26
+  offset: 0, 0
+  index: -1
+button_pause_down
+  rotate: false
+  xy: 246, 68
+  size: 26, 26
+  orig: 26, 26
+  offset: 0, 0
+  index: -1
+button_pause_up
+  rotate: false
+  xy: 272, 68
+  size: 26, 26
+  orig: 26, 26
+  offset: 0, 0
+  index: -1
+button_up
+  rotate: false
+  xy: 0, 22
+  size: 130, 26
+  orig: 130, 26
+  offset: 0, 0
+  index: -1
+camada
+  rotate: false
+  xy: 681, 73
+  size: 148, 152
+  orig: 148, 152
+  offset: 0, 0
+  index: 12
+ccontroller_attack
+  rotate: false
+  xy: 829, 79
+  size: 106, 40
+  orig: 106, 40
+  offset: 0, 0
+  index: -1
+chest
+  rotate: false
+  xy: 220, 94
+  size: 239, 162
+  orig: 239, 162
+  offset: 0, 0
+  index: -1
+controller_a
+  rotate: false
+  xy: 935, 181
+  size: 44, 44
+  orig: 44, 44
+  offset: 0, 0
+  index: -1
+controller_b
+  rotate: false
+  xy: 130, 30
+  size: 44, 44
+  orig: 44, 44
+  offset: 0, 0
+  index: -1
+controller_directional
+  rotate: false
+  xy: 829, 119
+  size: 106, 106
+  orig: 106, 106
+  offset: 0, 0
+  index: -1
+controller_down
+  rotate: false
+  xy: 935, 137
+  size: 44, 44
+  orig: 44, 44
+  offset: 0, 0
+  index: -1
+controller_holder
+  rotate: false
+  xy: 982, 222
+  size: 34, 34
+  orig: 34, 34
+  offset: 0, 0
+  index: -1
+controller_left
+  rotate: false
+  xy: 174, 30
+  size: 44, 44
+  orig: 44, 44
+  offset: 0, 0
+  index: -1
+controller_right
+  rotate: false
+  xy: 935, 93
+  size: 44, 44
+  orig: 44, 44
+  offset: 0, 0
+  index: -1
+controller_up
+  rotate: false
+  xy: 979, 178
+  size: 44, 44
+  orig: 44, 44
+  offset: 0, 0
+  index: -1
+furnance
+  rotate: false
+  xy: 459, 104
+  size: 222, 152
+  orig: 222, 152
+  offset: 0, 0
+  index: -1
+hungry
+  rotate: false
+  xy: 0, 0
+  size: 5, 8
+  orig: 5, 8
+  offset: 0, 0
+  index: -1
+invetory
+  rotate: false
+  xy: 0, 74
+  size: 220, 182
+  orig: 220, 182
+  offset: 0, 0
+  index: -1
+life
+  rotate: false
+  xy: 5, 0
+  size: 5, 8
+  orig: 5, 8
+  offset: 0, 0
+  index: -1
+slot_lock
+  rotate: false
+  xy: 1016, 247
+  size: 8, 9
+  orig: 8, 9
+  offset: 0, 0
+  index: -1
+slot_select
+  rotate: false
+  xy: 298, 70
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+take_all
+  rotate: false
+  xy: 0, 8
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: -1

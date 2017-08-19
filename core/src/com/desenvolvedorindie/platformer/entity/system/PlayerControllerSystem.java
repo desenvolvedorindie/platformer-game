@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.desenvolvedorindie.platformer.entity.component.CollidableComponent;
 import com.desenvolvedorindie.platformer.entity.component.JumpComponent;
 import com.desenvolvedorindie.platformer.entity.component.PlayerComponent;
@@ -27,6 +28,9 @@ public class PlayerControllerSystem extends IteratingSystem {
     private boolean moveLeft;
 
     private boolean jump;
+
+    private long secondToLastPressSpace;
+    private long lastPressSpace;
 
     public PlayerControllerSystem() {
         super(Aspect.all(PlayerComponent.class, JumpComponent.class));
@@ -63,6 +67,12 @@ public class PlayerControllerSystem extends IteratingSystem {
                 cRigidBody.velocity.y = cJump.jumpSpeed;
             }
         }
+
+
+        if(jump && lastPressSpace - secondToLastPressSpace < 500f) {
+            cPlayer.floating = !cPlayer.floating;
+            Gdx.app.log("Floating", String.valueOf(cPlayer.floating));
+        }
     }
 
     private class GameInputAdapter extends InputAdapter {
@@ -79,6 +89,8 @@ public class PlayerControllerSystem extends IteratingSystem {
                     moveLeft = true;
                     break;
                 case Input.Keys.SPACE:
+                    secondToLastPressSpace = lastPressSpace;
+                    lastPressSpace = TimeUtils.millis();
                     jump = true;
                     break;
             }

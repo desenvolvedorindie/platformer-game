@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.desenvolvedorindie.gdxcamera.constraint.*;
-import com.desenvolvedorindie.platformer.PlatformerGame;
 import com.desenvolvedorindie.platformer.block.Block;
 import com.desenvolvedorindie.platformer.entity.component.CollidableComponent;
 import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
@@ -49,6 +48,7 @@ public class CameraSystem extends BaseSystem {
         cameraConstraintBoundBox = new CameraConstraintBoundingBox(new BoundingBox(new Vector3(World.mapToWorld(2), World.mapToWorld(2), 0), new Vector3(World.mapToWorld(world.getWidth() - 2), World.mapToWorld(world.getHeight() - 2), 0)));
 
         cameraConstraint = new CameraConstraintMultiplexer(cameraZoom, cameraFollow, cameraConstraintBoundBox);
+        this.shapeRenderer = shapeRenderer;
     }
 
     @Override
@@ -72,7 +72,9 @@ public class CameraSystem extends BaseSystem {
         cameraConstraint.update(camera, delta);
 
         if (isDebug()) {
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             cameraConstraint.debug(camera, shapeRenderer, delta);
+            shapeRenderer.end();
         }
     }
 

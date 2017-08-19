@@ -77,7 +77,7 @@ public class World {
             worldConfigBuilder.with(
                     Priority.LOW,
                     collisionDebugSystem = new CollisionDebugSystem(this, camera, shapeRenderer),
-                    new DebugSystem(this, camera)
+                    new EntityDebugSystem(camera, 0)
             );
 
             if (Gdx.app.getType().equals(Application.ApplicationType.Desktop)) {
@@ -153,6 +153,14 @@ public class World {
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.F12)) {
             collisionDebugSystem.setEnabled(!collisionDebugSystem.isEnabled());
+        }
+
+        if (Gdx.app.getType().equals(Application.ApplicationType.Desktop)) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.B)) {
+                if (entityTrackerWindow != null) {
+                    entityTrackerWindow.setVisible(!entityTrackerWindow.isVisible());
+                }
+            }
         }
     }
 
@@ -238,10 +246,6 @@ public class World {
         }
 
         return found;
-    }
-
-    public EntityTrackerMainWindow getEntityTrackerWindow() {
-        return entityTrackerWindow;
     }
 
     public float getGravity() {
