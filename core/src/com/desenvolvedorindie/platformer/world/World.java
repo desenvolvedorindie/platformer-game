@@ -53,6 +53,8 @@ public class World {
 
     private CollisionDebugSystem collisionDebugSystem;
 
+    private EntityDebugSystem entityDebugSystem;
+
     public World(OrthographicCamera camera, SpriteBatch batch, ShapeRenderer shapeRenderer) {
         WorldConfigurationBuilder worldConfigBuilder = new WorldConfigurationBuilder()
                 .with(Priority.HIGH,
@@ -77,7 +79,7 @@ public class World {
             worldConfigBuilder.with(
                     Priority.LOW,
                     collisionDebugSystem = new CollisionDebugSystem(this, camera, shapeRenderer),
-                    new EntityDebugSystem(camera, 0)
+                    entityDebugSystem = new EntityDebugSystem(camera, 0)
             );
 
             if (Gdx.app.getType().equals(Application.ApplicationType.Desktop)) {
@@ -95,6 +97,14 @@ public class World {
         artemis.inject(entitiesFactory);
 
         player = entitiesFactory.createPlayer(artemis, 200, mapToWorld(getHeight() - 3));
+
+        if (collisionDebugSystem != null) {
+            collisionDebugSystem.setEnabled(false);
+        }
+
+        if (entityDebugSystem != null) {
+            entityDebugSystem.setEnabled(false);
+        }
     }
 
     public static float mapToWorld(int mapCoordinate) {
@@ -147,12 +157,20 @@ public class World {
     }
 
     private void debug() {
-        if(Gdx.input.isKeyJustPressed(Input.Keys.F11)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F10)) {
             cameraSystem.setDebug(!cameraSystem.isDebug());
         }
 
-        if(Gdx.input.isKeyJustPressed(Input.Keys.F12)) {
-            collisionDebugSystem.setEnabled(!collisionDebugSystem.isEnabled());
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F11)) {
+            if (collisionDebugSystem != null) {
+                collisionDebugSystem.setEnabled(!collisionDebugSystem.isEnabled());
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F12)) {
+            if (entityDebugSystem != null) {
+                entityDebugSystem.setEnabled(!entityDebugSystem.isEnabled());
+            }
         }
 
         if (Gdx.app.getType().equals(Application.ApplicationType.Desktop)) {
@@ -263,4 +281,5 @@ public class World {
     public Grid getWater() {
         return water;
     }
+
 }

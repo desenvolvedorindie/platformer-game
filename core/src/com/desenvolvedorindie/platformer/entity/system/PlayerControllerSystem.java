@@ -23,19 +23,21 @@ public class PlayerControllerSystem extends IteratingSystem {
 
     private ComponentMapper<CollidableComponent> mCollidable;
 
-    private boolean moveRight;
+    public boolean moveRight;
 
-    private boolean moveLeft;
+    public boolean moveLeft;
 
-    private boolean jump;
+    public boolean jump;
 
     private long secondToLastPressSpace;
     private long lastPressSpace;
 
+    private PlayerInputAdapter playerInputAdapter;
+
     public PlayerControllerSystem() {
         super(Aspect.all(PlayerComponent.class, JumpComponent.class));
 
-        Gdx.input.setInputProcessor(new InputMultiplexer(new GameInputAdapter()));
+        playerInputAdapter = new PlayerInputAdapter();
     }
 
     @Override
@@ -75,7 +77,7 @@ public class PlayerControllerSystem extends IteratingSystem {
         }
     }
 
-    private class GameInputAdapter extends InputAdapter {
+    private class PlayerInputAdapter extends InputAdapter {
 
         @Override
         public boolean keyDown(int keycode) {
@@ -116,4 +118,9 @@ public class PlayerControllerSystem extends IteratingSystem {
             return true;
         }
     }
+
+    public PlayerInputAdapter getPlayerInputAdapter() {
+        return playerInputAdapter;
+    }
+
 }

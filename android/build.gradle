@@ -16,6 +16,7 @@ android {
     }
     packagingOptions {
         exclude 'META-INF/robovm/ios/robovm.xml'
+        exclude 'META-INF/LICENSE'
     }
     defaultConfig {
         applicationId "com.desenvolvedorindie.platformer"

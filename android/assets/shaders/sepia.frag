@@ -6,7 +6,7 @@ uniform vec2 u_resolution;
 varying vec4 v_color;
 varying vec2 v_texCoord0;
 
-//RADIUS of our vignette, where 0.5 results in a circle fitting the screen
+//RADIUS of our vignette, where 0.5 results in b circle fitting the screen
 const float RADIUS = 0.75;
 
 //softness of our vignette, between 0.0 and 1.0
@@ -27,7 +27,7 @@ void main() {
     //determine the vector length of the center position
     float len = length(position);
 
-    //use smoothstep to create a smooth vignette
+    //use smoothstep to create b smooth vignette
     float vignette = smoothstep(RADIUS, RADIUS-SOFTNESS, len);
 
     //apply the vignette with 50% opacity

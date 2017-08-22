@@ -1,6 +1,5 @@
 package com.desenvolvedorindie.platformer.entity.state;
 
-import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
@@ -12,9 +11,9 @@ public enum PlayerState implements State<Entity> {
         public void update(Entity entity) {
             super.update(entity);
 
-            CollidableComponent cCollidable = mCollidable.get(entity);
-            StateComponent cState = mState.get(entity);
-            RigidBodyComponent cRigidBody = mRigidBody.get(entity);
+            CollidableComponent cCollidable = entity.getComponent(CollidableComponent.class);
+            StateComponent cState = entity.getComponent(StateComponent.class);
+            RigidBodyComponent cRigidBody = entity.getComponent(RigidBodyComponent.class);
 
             if (cCollidable.onGround) {
                 if (cRigidBody.velocity.x != 0) {
@@ -29,7 +28,7 @@ public enum PlayerState implements State<Entity> {
         public void enter(Entity entity) {
             super.enter(entity);
 
-            SpriterAnimationComponent cSpriterAnimation = mSpriterAnimation.get(entity);
+            SpriterAnimationComponent cSpriterAnimation = entity.getComponent(SpriterAnimationComponent.class);
 
             cSpriterAnimation.spriterAnimator.play("idle");
         }
@@ -39,9 +38,9 @@ public enum PlayerState implements State<Entity> {
         public void update(Entity entity) {
             super.update(entity);
 
-            CollidableComponent cCollidable = mCollidable.get(entity);
-            StateComponent cState = mState.get(entity);
-            RigidBodyComponent cRigidBody = mRigidBody.get(entity);
+            CollidableComponent cCollidable = entity.getComponent(CollidableComponent.class);
+            StateComponent cState = entity.getComponent(StateComponent.class);
+            RigidBodyComponent cRigidBody = entity.getComponent(RigidBodyComponent.class);
 
             if (cCollidable.onGround) {
                 if (cRigidBody.velocity.x == 0) {
@@ -56,7 +55,7 @@ public enum PlayerState implements State<Entity> {
         public void enter(Entity entity) {
             super.enter(entity);
 
-            SpriterAnimationComponent cSpriterAnimation = mSpriterAnimation.get(entity);
+            SpriterAnimationComponent cSpriterAnimation = entity.getComponent(SpriterAnimationComponent.class);
             cSpriterAnimation.spriterAnimator.play("walk");
         }
     },
@@ -65,11 +64,11 @@ public enum PlayerState implements State<Entity> {
         public void update(Entity entity) {
             super.update(entity);
 
-            RigidBodyComponent cRigidBody = mRigidBody.get(entity);
-            SpriterAnimationComponent cSpriterAnimation = mSpriterAnimation.get(entity);
-            CollidableComponent cCollidable = mCollidable.get(entity);
-            StateComponent cState = mState.get(entity);
-            PlayerComponent cPlayer = mPlayer.get(entity);
+            RigidBodyComponent cRigidBody = entity.getComponent(RigidBodyComponent.class);
+            SpriterAnimationComponent cSpriterAnimation = entity.getComponent(SpriterAnimationComponent.class);
+            CollidableComponent cCollidable = entity.getComponent(CollidableComponent.class);
+            StateComponent cState = entity.getComponent(StateComponent.class);
+            PlayerComponent cPlayer = entity.getComponent(PlayerComponent.class);
 
             if (cRigidBody.velocity.y < 0) {
                 if (!cPlayer.alreadyFalling) {
@@ -91,7 +90,7 @@ public enum PlayerState implements State<Entity> {
         public void exit(Entity entity) {
             super.exit(entity);
 
-            PlayerComponent cPlayer = mPlayer.get(entity);
+            PlayerComponent cPlayer = entity.getComponent(PlayerComponent.class);
 
             cPlayer.alreadyFalling = false;
         }
@@ -100,8 +99,8 @@ public enum PlayerState implements State<Entity> {
         public void enter(Entity entity) {
             super.enter(entity);
 
-            RigidBodyComponent cRigidBody = mRigidBody.get(entity);
-            SpriterAnimationComponent cSpriterAnimation = mSpriterAnimation.get(entity);
+            RigidBodyComponent cRigidBody = entity.getComponent(RigidBodyComponent.class);
+            SpriterAnimationComponent cSpriterAnimation = entity.getComponent(SpriterAnimationComponent.class);
 
             if (cRigidBody.velocity.y > 0) {
                 cSpriterAnimation.spriterAnimator.play("jump_start");
@@ -111,30 +110,9 @@ public enum PlayerState implements State<Entity> {
         }
     };
 
-    protected ComponentMapper<CollidableComponent> mCollidable;
-
-    protected ComponentMapper<RigidBodyComponent> mRigidBody;
-
-    protected ComponentMapper<TransformComponent> mTransform;
-
-    protected ComponentMapper<SpriterAnimationComponent> mSpriterAnimation;
-
-    protected ComponentMapper<PlayerComponent> mPlayer;
-
-    protected ComponentMapper<StateComponent> mState;
-
-    private boolean alreadyInit;
-
-    protected void init(Entity entity) {
-        if (!alreadyInit) {
-            entity.getWorld().inject(this);
-            alreadyInit = true;
-        }
-    }
-
     @Override
     public void enter(Entity entity) {
-        init(entity);
+
     }
 
     @Override
@@ -144,10 +122,8 @@ public enum PlayerState implements State<Entity> {
 
     @Override
     public void update(Entity entity) {
-        init(entity);
-
-        RigidBodyComponent cRigidBodyComponent = mRigidBody.get(entity);
-        TransformComponent cTransform = mTransform.get(entity);
+        RigidBodyComponent cRigidBodyComponent = entity.getComponent(RigidBodyComponent.class);
+        TransformComponent cTransform = entity.getComponent(TransformComponent.class);
 
         if (cRigidBodyComponent.velocity.x > 0) {
             cTransform.scaleX = Math.abs(cTransform.scaleX);

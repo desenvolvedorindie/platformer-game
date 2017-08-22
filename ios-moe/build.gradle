@@ -9,7 +9,7 @@ task copyNatives << {
         if (outputDir != null) {
             FileCollection fileCollection = zipTree(jar)
             for (File libFile : fileCollection) {
-                if (libFile.getAbsolutePath().endsWith(".a") && !libFile.getAbsolutePath().contains("/tvos/")) {
+                if (libFile.getAbsolutePath().endsWith(".b") && !libFile.getAbsolutePath().contains("/tvos/")) {
                     copy {
                         from libFile.getAbsolutePath()
                         into outputDir

@@ -107,7 +107,7 @@ public class AIEditorTestProject extends Game {
 			+ " - tree -> tree: move tasks, hold ctrl to copy instead\n"
 			+ "\n"
 			+ "click task in tree to edit its parameters - nyi\n"
-			+ "TODO a lot of crap\n");
+			+ "TODO b lot of crap\n");
 		tutorial.pack();
 //		tutorial.show(stage);
 	}

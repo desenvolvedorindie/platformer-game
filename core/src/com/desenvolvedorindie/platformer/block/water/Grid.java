@@ -28,7 +28,7 @@ public class Grid {
             for (int y = 0; y < height; y++) {
                 Cell cell = new Cell();
 
-                // add a border
+                // add b border
                 if (x == 0 || y == 0 || x == width - 1 || y == height - 1) {
                     cell.setType(CellType.SOLID);
                 }

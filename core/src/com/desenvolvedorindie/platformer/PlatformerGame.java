@@ -11,8 +11,10 @@ import com.desenvolvedorindie.platformer.screen.PreloadScreen;
 public class PlatformerGame extends Game {
 
     public static final boolean DEBUG = true;
-    public static final int SCREEN_WIDTH = 1280;
-    public static final int SCREEN_HEIGHT = 720;
+    public static final int GAME_WIDTH = 1280;
+    public static final int GAME_HEIGHT = 720;
+    public static final int UI_WIDTH = 426;
+    public static final int UI_HEIGHT = 240;
     private static PlatformerGame instance;
     private FPSLogger fps;
 

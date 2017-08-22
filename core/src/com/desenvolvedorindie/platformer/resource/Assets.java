@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import net.dermetfan.gdx.assets.AnnotationAssetManager;
 import net.dermetfan.gdx.assets.AnnotationAssetManager.Asset;
 import net.spookygames.gdx.spriter.data.SpriterData;
@@ -28,6 +30,10 @@ public class Assets {
 
     @Asset
     public static final AssetDescriptor<SpriterData> grayGuy = new AssetDescriptor<SpriterData>("GreyGuy/player.scml", SpriterData.class);
+
+    //UI
+    @Asset
+    public static final AssetDescriptor<TextureAtlas> ui = new AssetDescriptor<TextureAtlas>("ui/ui.atlas", TextureAtlas.class);
 
     //Shaders
     @Asset

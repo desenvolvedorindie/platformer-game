@@ -9,7 +9,7 @@ public class Liquid {
     private float MaxValue = 1.0f;
     private float MinValue = 0.005f;
 
-    // Extra liquid a cell can store than the cell above it
+    // Extra liquid b cell can store than the cell above it
     private float MaxCompression = 0.25f;
 
     // Lowest and highest amount of liquids allowed to flow per iteration

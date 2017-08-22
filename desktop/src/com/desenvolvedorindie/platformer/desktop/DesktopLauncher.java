@@ -7,7 +7,7 @@ import com.desenvolvedorindie.platformer.PlatformerGame;
 public class DesktopLauncher {
     public static void main(String[] arg) {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-        config.setWindowedMode(PlatformerGame.SCREEN_WIDTH, PlatformerGame.SCREEN_HEIGHT);
+        config.setWindowedMode(PlatformerGame.GAME_WIDTH, PlatformerGame.GAME_HEIGHT);
         config.setResizable(false);
         config.useVsync(true);
         config.setTitle(PlatformerGame.class.getSimpleName());
