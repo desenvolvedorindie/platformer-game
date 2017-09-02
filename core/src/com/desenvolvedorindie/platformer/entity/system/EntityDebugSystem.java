@@ -2,7 +2,6 @@ package com.desenvolvedorindie.platformer.entity.system;
 
 import com.artemis.BaseSystem;
 import com.artemis.ComponentMapper;
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
@@ -11,18 +10,13 @@ import com.badlogic.gdx.math.Vector3;
 import com.desenvolvedorindie.platformer.entity.component.PlayerComponent;
 import com.desenvolvedorindie.platformer.entity.component.RigidBodyComponent;
 import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
-import com.desenvolvedorindie.platformer.world.World;
 
 public class EntityDebugSystem extends BaseSystem {
 
-    private ComponentMapper<PlayerComponent> mPlayer;
-
-    private ComponentMapper<TransformComponent> mTransform;
-
-    private ComponentMapper<RigidBodyComponent> mRigidBody;
-
     private final Vector3 screenCoordinate = new Vector3();
-
+    private ComponentMapper<PlayerComponent> mPlayer;
+    private ComponentMapper<TransformComponent> mTransform;
+    private ComponentMapper<RigidBodyComponent> mRigidBody;
     private Camera camera;
 
     private int entity;
@@ -46,7 +40,7 @@ public class EntityDebugSystem extends BaseSystem {
             cRigidBody.velocity.set(Vector2.Zero);
         }
 
-        if(Gdx.input.isKeyJustPressed(Input.Keys.G)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
             cPlayer.godMode = !cPlayer.godMode;
         }
     }

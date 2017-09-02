@@ -8,4 +8,12 @@ public class JumpComponent extends Component {
 
     public float jumpSpeed = 300;
 
+    public float minJumpSpeed = 100;
+
+    public boolean wallJump = false;
+
+    public int jumps = 0;
+
+    public int maxJumps = 1;
+
 }

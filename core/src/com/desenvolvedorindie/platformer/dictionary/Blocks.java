@@ -19,6 +19,13 @@ public class Blocks {
 
     public static final Block OBSIDIAN;
 
+    static {
+        AIR = register(AIR_ID, new BlockAir());
+        DIRT = register(1, new Block(Assets.manager.get(Assets.dirt)));
+        COBBLESTONE = register(2, new Block(Assets.manager.get(Assets.cobblestone)));
+        OBSIDIAN = register(3, new Block(Assets.manager.get(Assets.obsidian)));
+    }
+
     public static Block getBlockById(int id) {
         return REGISTRY.get(id);
     }
@@ -30,13 +37,6 @@ public class Blocks {
     private static Block register(int id, Block block) {
         REGISTRY.put(id, block);
         return block;
-    }
-
-    static {
-        AIR = register(AIR_ID, new BlockAir());
-        DIRT = register(1, new Block(Assets.manager.get(Assets.dirt)));
-        COBBLESTONE = register(2, new Block(Assets.manager.get(Assets.cobblestone)));
-        OBSIDIAN = register(3, new Block(Assets.manager.get(Assets.obsidian)));
     }
 
 }

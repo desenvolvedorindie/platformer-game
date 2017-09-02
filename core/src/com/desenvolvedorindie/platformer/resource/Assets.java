@@ -6,7 +6,6 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import net.dermetfan.gdx.assets.AnnotationAssetManager;
 import net.dermetfan.gdx.assets.AnnotationAssetManager.Asset;
 import net.spookygames.gdx.spriter.data.SpriterData;
@@ -44,6 +43,8 @@ public class Assets {
     public static final AssetDescriptor<ShaderProgram> INVERT = new AssetDescriptor<ShaderProgram>("shaders/invert.vert", ShaderProgram.class);
     @Asset
     public static final AssetDescriptor<ShaderProgram> EMBOSS = new AssetDescriptor<ShaderProgram>("shaders/emboss.vert", ShaderProgram.class);
+    @Asset
+    public static final AssetDescriptor<ShaderProgram> SKY = new AssetDescriptor<ShaderProgram>("shaders/sky.vert", ShaderProgram.class);
 
     public static void load() {
         manager.setLoader(SpriterData.class, new SpriterDataLoader(manager.getFileHandleResolver()));
@@ -60,6 +61,7 @@ public class Assets {
         Gdx.app.log("VIGNETTE", manager.get(VIGNETTE).isCompiled() ? "Compiled" : manager.get(VIGNETTE).getLog());
         Gdx.app.log("INVERT", manager.get(INVERT).isCompiled() ? "Compiled" : manager.get(INVERT).getLog());
         Gdx.app.log("EMBOSS", manager.get(EMBOSS).isCompiled() ? "Compiled" : manager.get(EMBOSS).getLog());
+        Gdx.app.log("SKY", manager.get(SKY).isCompiled() ? "Compiled" : manager.get(SKY).getLog());
     }
 
 }

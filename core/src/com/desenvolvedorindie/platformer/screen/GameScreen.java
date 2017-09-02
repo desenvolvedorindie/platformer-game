@@ -42,19 +42,21 @@ public class GameScreen extends ScreenAdapter {
         stage = new Stage(new FitViewport(PlatformerGame.UI_WIDTH, PlatformerGame.UI_HEIGHT, uiCamera), batch);
         stage.setDebugAll(PlatformerGame.DEBUG);
         skin = new Skin(Assets.manager.get(Assets.ui));
-        gameHud = new GameHud(stage, skin);
+        gameHud = new GameHud(skin);
 
-        world = new World(camera, batch, shapeRenderer);
+        stage.addActor(gameHud);
+
+        world = new World(camera, batch, shapeRenderer, gameHud);
         world.regenerate();
 
-        gameHud.playerControllerSystem = world.getArtemis().getSystem(PlayerControllerSystem.class);
         InputProcessor playerInput = world.getArtemis().getSystem(PlayerControllerSystem.class).getPlayerInputAdapter();
         Gdx.input.setInputProcessor(new InputMultiplexer(stage, playerInput));
+        gameHud.setHudListener(world.getArtemis().getSystem(PlayerControllerSystem.class).getPlayerInputAdapter());
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClearColor(0.7f, 0.7f, 1.0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         stage.act(delta);

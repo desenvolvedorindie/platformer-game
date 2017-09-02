@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.desenvolvedorindie.platformer.graphics.FPSLogger;
+import com.desenvolvedorindie.platformer.input.GameInput;
 import com.desenvolvedorindie.platformer.resource.Assets;
 import com.desenvolvedorindie.platformer.screen.PreloadScreen;
 
@@ -15,11 +16,13 @@ public class PlatformerGame extends Game {
     public static final int GAME_HEIGHT = 720;
     public static final int UI_WIDTH = 426;
     public static final int UI_HEIGHT = 240;
+    public static GameInput input;
     private static PlatformerGame instance;
     private FPSLogger fps;
 
     private PlatformerGame() {
         Box2D.init();
+        input = new GameInput();
     }
 
     public static PlatformerGame getInstance() {
@@ -40,6 +43,8 @@ public class PlatformerGame extends Game {
 
     @Override
     public void render() {
+        input.process();
+
         super.render();
 
         if (DEBUG) {

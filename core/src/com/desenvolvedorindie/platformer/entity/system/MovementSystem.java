@@ -3,7 +3,6 @@ package com.desenvolvedorindie.platformer.entity.system;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -22,15 +21,12 @@ public class MovementSystem extends IteratingSystem {
 
     private World world;
 
-    private OrthographicCamera camera;
-
     private Array<Rectangle> tiles = new Array<Rectangle>();
     private Vector2 velocity = new Vector2();
 
-    public MovementSystem(World world, OrthographicCamera camera) {
+    public MovementSystem(World world) {
         super(Aspect.all(TransformComponent.class, RigidBodyComponent.class));
         this.world = world;
-        this.camera = camera;
     }
 
     @Override

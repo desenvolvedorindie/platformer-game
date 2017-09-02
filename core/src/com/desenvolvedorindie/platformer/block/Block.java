@@ -1,9 +1,6 @@
 package com.desenvolvedorindie.platformer.block;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.physics.box2d.*;
-
-import static com.badlogic.gdx.physics.box2d.BodyDef.BodyType.StaticBody;
 
 public class Block {
 

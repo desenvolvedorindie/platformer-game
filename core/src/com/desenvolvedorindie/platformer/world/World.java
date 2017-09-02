@@ -20,6 +20,8 @@ import com.desenvolvedorindie.platformer.block.water.Grid;
 import com.desenvolvedorindie.platformer.dictionary.Blocks;
 import com.desenvolvedorindie.platformer.entity.EntitiesFactory;
 import com.desenvolvedorindie.platformer.entity.system.*;
+import com.desenvolvedorindie.platformer.scene2d.GameHud;
+import net.mostlyoriginal.api.event.common.EventSystem;
 import net.namekdev.entity_tracker.EntityTracker;
 import net.namekdev.entity_tracker.ui.EntityTrackerMainWindow;
 import se.feomedia.orion.system.OperationSystem;
@@ -55,14 +57,15 @@ public class World {
 
     private EntityDebugSystem entityDebugSystem;
 
-    public World(OrthographicCamera camera, SpriteBatch batch, ShapeRenderer shapeRenderer) {
+    public World(OrthographicCamera camera, SpriteBatch batch, ShapeRenderer shapeRenderer, GameHud gameHud) {
         WorldConfigurationBuilder worldConfigBuilder = new WorldConfigurationBuilder()
                 .with(Priority.HIGH,
                         new GroupManager(),
                         new PlayerManager(),
                         new TagManager(),
-                        new PlayerControllerSystem(),
-                        new MovementSystem(this, camera),
+                        new EventSystem(),
+                        new PlayerControllerSystem(gameHud),
+                        new MovementSystem(this),
                         new StateSystem(),
                         new OperationSystem(),
                         new DayNightCycleSystem()

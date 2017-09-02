@@ -6,6 +6,7 @@ buildscript {
         box2DLightsVersion = '1.4'
         aiVersion = '1.8.1'
         artemisVersion = '2.1.0'
+        artemisOdbContribVersion = '2.2.0'
         artemisEntityTrackerVersion = '0.4.0-SNAPSHOT'
         gdxUtilsVersion = '0.13.4'
         gdxCameras = '0.0.4'
@@ -185,6 +186,7 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
         compile "net.onedaybeard.artemis:artemis-odb:$artemisVersion"
+        compile "net.mostlyoriginal.artemis-odb:contrib-eventbus:$artemisOdbContribVersion"
         compile "net.namekdev.entity_tracker:artemis-entity-tracker:$artemisEntityTrackerVersion"
         compile "net.namekdev.entity_tracker:artemis-entity-tracker-gui:$artemisEntityTrackerVersion"
         compile "net.dermetfan.libgdx-utils:libgdx-utils:$gdxUtilsVersion"
