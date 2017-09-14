@@ -2,15 +2,19 @@ package com.desenvolvedorindie.platformer.world;
 
 import com.artemis.WorldConfiguration;
 import com.artemis.WorldConfigurationBuilder;
+import com.artemis.io.JsonArtemisSerializer;
 import com.artemis.managers.GroupManager;
 import com.artemis.managers.PlayerManager;
 import com.artemis.managers.TagManager;
+import com.artemis.managers.WorldSerializationManager;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -32,6 +36,12 @@ import static com.artemis.WorldConfigurationBuilder.Priority;
 import static com.desenvolvedorindie.platformer.block.water.Cell.CellType;
 
 public class World {
+
+    public static final int BG = 0;
+    public static final int FG = 1;
+
+    public static final String NAME_BG = "background";
+    public static final String NAME_FG = "foreground";
 
     private EntityTrackerMainWindow entityTrackerWindow;
 
@@ -68,7 +78,8 @@ public class World {
                         new MovementSystem(this),
                         new StateSystem(),
                         new OperationSystem(),
-                        new DayNightCycleSystem()
+                        new DayNightCycleSystem(),
+                        new WorldSerializationManager()
                 )
                 .with(Priority.LOW,
                         new TileRenderSystem(this, camera, batch),
@@ -77,6 +88,8 @@ public class World {
                         new WaterSystem(this, camera, shapeRenderer),
                         cameraSystem = new CameraSystem(this, camera, shapeRenderer)
                 );
+
+        //worldConfigBuilder.with(new EEELPlugin());
 
         if (PlatformerGame.DEBUG) {
             worldConfigBuilder.with(
@@ -96,10 +109,14 @@ public class World {
 
         artemis = new com.artemis.World(config);
 
-        entitiesFactory = new EntitiesFactory();
+        JsonArtemisSerializer backend = new JsonArtemisSerializer(artemis);
+        backend.prettyPrint(true);
+        artemis.getSystem(WorldSerializationManager.class).setSerializer(backend);
+
+        entitiesFactory = new EntitiesFactory(artemis);
         artemis.inject(entitiesFactory);
 
-        player = entitiesFactory.createPlayer(artemis, 200, mapToWorld(getHeight() - 3));
+        player = entitiesFactory.createPlayer(200, mapToWorld(getHeight() - 3));
 
         if (collisionDebugSystem != null) {
             collisionDebugSystem.setEnabled(false);
@@ -283,6 +300,36 @@ public class World {
 
     public Grid getWater() {
         return water;
+    }
+
+    public void load(TiledMap tiledMap) {
+        int width = (Integer) tiledMap.getProperties().get("width");
+        int height = (Integer) tiledMap.getProperties().get("height");
+
+        map = new int[width][height][2];
+
+        TiledMapTileLayer background = (TiledMapTileLayer) tiledMap.getLayers().get(NAME_BG);
+        TiledMapTileLayer foreground = (TiledMapTileLayer) tiledMap.getLayers().get(NAME_FG);
+
+        TiledMapTileLayer.Cell cell;
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                cell = background.getCell(x, y);
+                if (cell != null) {
+                    map[x][y][World.BG] = Blocks.getIdByName(String.valueOf(cell.getTile().getProperties().get("name")));
+                }
+            }
+        }
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                cell = foreground.getCell(x, y);
+                if (cell != null) {
+                    map[x][y][World.FG] = Blocks.getIdByName(String.valueOf(cell.getTile().getProperties().get("name")));
+                }
+            }
+        }
     }
 
 }

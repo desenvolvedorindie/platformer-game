@@ -1,6 +1,8 @@
 package com.desenvolvedorindie.platformer.block;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.desenvolvedorindie.platformer.world.World;
 
 public class Block {
 
@@ -14,6 +16,12 @@ public class Block {
 
     public boolean isSolid() {
         return true;
+    }
+
+    public void render(World world, Batch batch, int x, int y, int layer) {
+        if(texture != null) {
+            batch.draw(texture, World.mapToWorld(x), World.mapToWorld(y), Block.TILE_SIZE, Block.TILE_SIZE);
+        }
     }
 
 }

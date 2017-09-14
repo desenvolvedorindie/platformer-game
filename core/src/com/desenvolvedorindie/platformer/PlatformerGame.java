@@ -1,8 +1,11 @@
 package com.desenvolvedorindie.platformer;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.desenvolvedorindie.platformer.graphics.FPSLogger;
 import com.desenvolvedorindie.platformer.input.GameInput;
@@ -11,6 +14,7 @@ import com.desenvolvedorindie.platformer.screen.PreloadScreen;
 
 public class PlatformerGame extends Game {
 
+    public static final String NAME = "Plataformer";
     public static final boolean DEBUG = true;
     public static final int GAME_WIDTH = 1280;
     public static final int GAME_HEIGHT = 720;
@@ -20,22 +24,18 @@ public class PlatformerGame extends Game {
     private static PlatformerGame instance;
     private FPSLogger fps;
 
-    private PlatformerGame() {
-        Box2D.init();
-        input = new GameInput();
-    }
-
-    public static PlatformerGame getInstance() {
-        if (instance == null) {
-            instance = new PlatformerGame();
-        }
+    public static PlatformerGame instance() {
         return instance;
     }
 
     @Override
     public void create() {
+        instance = this;
+
+        input = new GameInput();
+
         if (DEBUG) {
-            fps = new FPSLogger(PlatformerGame.class.getSimpleName(), false, true);
+            fps = new FPSLogger(NAME, false, true);
         }
 
         this.setScreen(new PreloadScreen());
@@ -62,4 +62,5 @@ public class PlatformerGame extends Game {
     public void dispose() {
         Assets.manager.dispose();
     }
+
 }

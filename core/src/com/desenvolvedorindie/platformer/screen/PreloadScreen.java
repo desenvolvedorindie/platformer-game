@@ -18,7 +18,7 @@ public class PreloadScreen extends ScreenAdapter {
 
         if (Assets.manager.update()) {
             Assets.debug();
-            PlatformerGame.getInstance().setScreen(new GameScreen());
+            PlatformerGame.instance().setScreen(new GameScreen());
         }
     }
 }

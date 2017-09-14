@@ -48,29 +48,23 @@ public class TileRenderSystem extends BaseSystem {
     }
 
     private void renderBackground(Batch batch) {
-        Texture texture = null;
+        Block block;
 
         for (int x = 0; x < world.getWidth(); x++) {
             for (int y = 0; y < world.getHeight(); y++) {
-                texture = world.getBlock(x, y, 0).texture;
-
-                if (texture != null) {
-                    batch.draw(texture, World.mapToWorld(x), World.mapToWorld(y));
-                }
+                block = world.getBlock(x, y, World.BG);
+                block.render(world, batch, x, y, World.BG);
             }
         }
     }
 
     private void renderForeground(Batch batch) {
-        Texture texture = null;
+        Block block;
 
         for (int x = 0; x < world.getWidth(); x++) {
             for (int y = 0; y < world.getHeight(); y++) {
-                texture = world.getBlock(x, y, 1).texture;
-
-                if (texture != null) {
-                    batch.draw(texture, World.mapToWorld(x)/* / PPM*/, World.mapToWorld(y)/* / PPM*/, Block.TILE_SIZE/* / PPM*/, Block.TILE_SIZE/* / PPM*/);
-                }
+                block = world.getBlock(x, y, World.FG);
+                block.render(world, batch, x, y, World.FG);
             }
         }
     }

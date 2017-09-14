@@ -43,6 +43,8 @@ public class CameraSystem extends BaseSystem {
 
         cameraZoom = new CameraZoom(ZOOM_LEVELS, 1f);
 
+        cameraZoom.zoomIn();
+
         cameraFollow = new CameraFollowConstraint(playerPositionV3, 1f);
 
         cameraConstraintBoundBox = new CameraConstraintBoundingBox(new BoundingBox(new Vector3(World.mapToWorld(2), World.mapToWorld(2), 0), new Vector3(World.mapToWorld(world.getWidth() - 2), World.mapToWorld(world.getHeight() - 2), 0)));

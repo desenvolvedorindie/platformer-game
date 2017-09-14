@@ -6,6 +6,8 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import net.dermetfan.gdx.assets.AnnotationAssetManager;
 import net.dermetfan.gdx.assets.AnnotationAssetManager.Asset;
 import net.spookygames.gdx.spriter.data.SpriterData;
@@ -17,11 +19,15 @@ public class Assets {
 
     // BLOCKS
     @Asset
-    public static final AssetDescriptor<Texture> dirt = new AssetDescriptor<Texture>("blocks/dirt.png", Texture.class);
+    public static final AssetDescriptor<Texture> dirt = new AssetDescriptor<Texture>("tiles/dirt.png", Texture.class);
     @Asset
-    public static final AssetDescriptor<Texture> cobblestone = new AssetDescriptor<Texture>("blocks/cobblestone.png", Texture.class);
+    public static final AssetDescriptor<Texture> cobblestone = new AssetDescriptor<Texture>("tiles/cobblestone.png", Texture.class);
     @Asset
-    public static final AssetDescriptor<Texture> obsidian = new AssetDescriptor<Texture>("blocks/obsidian.png", Texture.class);
+    public static final AssetDescriptor<Texture> obsidian = new AssetDescriptor<Texture>("tiles/obsidian.png", Texture.class);
+
+    //ITEMS
+    @Asset
+    public static final AssetDescriptor<Texture> sword = new AssetDescriptor<Texture>("items/sword.png", Texture.class);
 
     //ENTITIES
     @Asset
@@ -46,8 +52,14 @@ public class Assets {
     @Asset
     public static final AssetDescriptor<ShaderProgram> SKY = new AssetDescriptor<ShaderProgram>("shaders/sky.vert", ShaderProgram.class);
 
+    //Dungeons
+    @Asset
+    public static final AssetDescriptor<TiledMap> DUNGEON_WORLD = new AssetDescriptor<TiledMap>("dungeons/world.tmx", TiledMap.class);
+
     public static void load() {
         manager.setLoader(SpriterData.class, new SpriterDataLoader(manager.getFileHandleResolver()));
+
+        manager.setLoader(TiledMap.class, new TmxMapLoader(manager.getFileHandleResolver()));
 
         Texture.setAssetManager(manager);
 

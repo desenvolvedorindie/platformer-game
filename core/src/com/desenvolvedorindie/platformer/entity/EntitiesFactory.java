@@ -1,8 +1,6 @@
 package com.desenvolvedorindie.platformer.entity;
 
-import com.artemis.ComponentMapper;
-import com.artemis.Entity;
-import com.artemis.World;
+import com.artemis.*;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -13,6 +11,10 @@ import com.desenvolvedorindie.platformer.resource.spriter.PlayerSpriterAnimation
 import net.spookygames.gdx.spriter.SpriterAnimator;
 
 public class EntitiesFactory {
+
+    private World world;
+
+    private Archetype playerArchetype;
 
     private ComponentMapper<CollidableComponent> mCollidableComponent;
 
@@ -30,33 +32,47 @@ public class EntitiesFactory {
 
     private ComponentMapper<TransformComponent> mTransform;
 
-    public int createPlayer(World world, float x, float y) {
-        int entity = world.create();
+    public EntitiesFactory(World world) {
+        this.world = world;
 
-        TransformComponent cTransform = mTransform.create(entity);
-        cTransform.position.set(x, y);
+        playerArchetype = new ArchetypeBuilder()
+                .add(TransformComponent.class)
+                .add(SpriterAnimationComponent.class)
+                .add(StateComponent.class)
+                .add(PlayerComponent.class)
+                .add(JumpComponent.class)
+                .add(RigidBodyComponent.class)
+                .add(CollidableComponent.class)
+                .build(world);
+    }
+
+    public int createPlayer(float x, float y) {
+        int entity = world.create(playerArchetype);
+
+        TransformComponent cTransform = mTransform.get(entity);
+        mTransform.get(entity).position.set(x, y);
 
         Texture texture = Assets.manager.get(Assets.player);
 
         int width = texture.getWidth();
         int height = texture.getHeight();
 
-        SpriterAnimationComponent cSpriterAnimation = mSpriterAnimationComponent.create(entity);
+        SpriterAnimationComponent cSpriterAnimation = mSpriterAnimationComponent.get(entity);
         cSpriterAnimation.spriterAnimator = new SpriterAnimator(Assets.manager.get(Assets.grayGuy).entities.first());
         cSpriterAnimation.spriterAnimator.play("idle");
 
         cTransform.scaleX = cTransform.scaleY = 0.17f;
 
-        PlayerComponent cPlayer = mPlayer.create(entity);
+        PlayerComponent cPlayer = mPlayer.get(entity);
 
-        StateComponent cState = mState.create(entity);
+        StateComponent cState = mState.get(entity);
         cState.state = new DefaultStateMachine<Entity, PlayerState>(world.getEntity(entity), PlayerState.Idle);
 
-        JumpComponent cJump = mJump.create(entity);
+        JumpComponent cJump = mJump.get(entity);
 
-        final RigidBodyComponent cRigidBody = mRigiBody.create(entity);
+        final RigidBodyComponent cRigidBody = mRigiBody.get(entity);
 
-        CollidableComponent cCollidable = mCollidableComponent.create(entity);
+        CollidableComponent cCollidable = mCollidableComponent.get(entity);
         cCollidable.collisionBox.setPosition(new Vector2(x, y));
         cCollidable.collisionBox.setSize(width, height);
 

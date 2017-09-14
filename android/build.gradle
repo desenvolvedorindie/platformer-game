@@ -17,11 +17,17 @@ android {
     packagingOptions {
         exclude 'META-INF/robovm/ios/robovm.xml'
         exclude 'META-INF/LICENSE'
+        exclude 'META-INF/INDEX.LIST'
     }
     defaultConfig {
         applicationId "com.desenvolvedorindie.platformer"
         minSdkVersion 9
         targetSdkVersion 25
+        multiDexEnabled true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 // called every time gradle gets executed, takes the native dependencies of

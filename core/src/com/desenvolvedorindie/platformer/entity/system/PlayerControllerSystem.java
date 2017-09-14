@@ -6,7 +6,13 @@ import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.ControllerListener;
+import com.badlogic.gdx.controllers.Controllers;
+import com.badlogic.gdx.controllers.PovDirection;
+import com.badlogic.gdx.controllers.mappings.Xbox;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.StringBuilder;
 import com.desenvolvedorindie.platformer.entity.component.CollidableComponent;
 import com.desenvolvedorindie.platformer.entity.component.JumpComponent;
 import com.desenvolvedorindie.platformer.entity.component.PlayerComponent;
@@ -16,41 +22,48 @@ import com.desenvolvedorindie.platformer.scene2d.GameHud;
 
 public class PlayerControllerSystem extends IteratingSystem {
 
-    public InputSequence especial;
+    public InputSequence especial, especial2;
     public boolean moveRight;
     public boolean moveLeft;
     public boolean jump;
+    private int leftKey = Input.Keys.A, rightKey = Input.Keys.D, downKey = Input.Keys.S, upKey = Input.Keys.W, jumpKey = Input.Keys.SPACE;
     private ComponentMapper<PlayerComponent> mPlayer;
     private ComponentMapper<RigidBodyComponent> mRigidBody;
     private ComponentMapper<JumpComponent> mJump;
     private ComponentMapper<CollidableComponent> mCollidable;
-    private long secondToLastPressSpace;
-    private long lastPressSpace;
 
     private PlayerInputAdapter playerInputAdapter;
 
     public PlayerControllerSystem(GameHud gameHud) {
         super(Aspect.all(PlayerComponent.class, JumpComponent.class));
 
+        Controllers.addListener(new PlayerControllerListener());
+
         playerInputAdapter = new PlayerInputAdapter();
 
-        especial = new InputSequence(1, new InputSequence.IInputButton[]{
+        especial = new InputSequence(0.5f, new InputSequence.IInputButton[]{
                 new InputSequence.MultipleInputButton(new InputSequence.IInputButton[]{
-                        new InputSequence.InputButton(InputSequence.Type.KEY, Input.Keys.S),
-                        new InputSequence.InputButton(InputSequence.Type.KEY, Input.Keys.DOWN),
+                        new InputSequence.InputButton(InputSequence.Type.KEY, downKey),
                         //gameHud.new GameHudInputButton(GameHud.Buttons.DOWN),
                 }),
                 new InputSequence.MultipleInputButton(new InputSequence.IInputButton[]{
-                        new InputSequence.InputButton(InputSequence.Type.KEY, Input.Keys.A),
-                        new InputSequence.InputButton(InputSequence.Type.KEY, Input.Keys.D),
-                        new InputSequence.InputButton(InputSequence.Type.KEY, Input.Keys.LEFT),
-                        new InputSequence.InputButton(InputSequence.Type.KEY, Input.Keys.RIGHT),
+                        new InputSequence.InputButton(InputSequence.Type.KEY, leftKey),
+                        new InputSequence.InputButton(InputSequence.Type.KEY, rightKey),
                         //gameHud.new GameHudInputButton(GameHud.Buttons.LEFT),
                         //gameHud.new GameHudInputButton(GameHud.Buttons.RIGHT),
                 }),
                 new InputSequence.MultipleInputButton(new InputSequence.IInputButton[]{
                         new InputSequence.InputButton(InputSequence.Type.BUTTON, Input.Buttons.LEFT),
                         //gameHud.new GameHudInputButton(GameHud.Buttons.B),
+                }),
+        });
+
+        especial2 = new InputSequence(0.5f, new InputSequence.IInputButton[]{
+                new InputSequence.InputButton(InputSequence.Type.KEY, upKey),
+                new InputSequence.InputButton(InputSequence.Type.KEY, downKey),
+                new InputSequence.MultipleInputButton(new InputSequence.IInputButton[]{
+                        new InputSequence.InputButton(InputSequence.Type.KEY, leftKey),
+                        new InputSequence.InputButton(InputSequence.Type.KEY, rightKey),
                 }),
         });
     }
@@ -63,7 +76,11 @@ public class PlayerControllerSystem extends IteratingSystem {
         CollidableComponent cCollidable = mCollidable.get(entityId);
 
         if (especial.process()) {
-            Gdx.app.log("Especial", "Especial");
+            Gdx.app.log("Sequence", "Especial");
+        }
+
+        if (especial2.process()) {
+            Gdx.app.log("Sequence", "Especial 2");
         }
 
         if (cPlayer.canWalk) {
@@ -97,43 +114,96 @@ public class PlayerControllerSystem extends IteratingSystem {
         return playerInputAdapter;
     }
 
-    private class PlayerInputAdapter extends InputAdapter implements GameHud.GameHudListener {
+    private class PlayerControllerListener implements ControllerListener {
 
         @Override
-        public boolean keyDown(int keycode) {
-            switch (keycode) {
-                case Input.Keys.RIGHT:
-                case Input.Keys.D:
-                    moveRight = true;
-                    break;
-                case Input.Keys.LEFT:
-                case Input.Keys.A:
-                    moveLeft = true;
-                    break;
-                case Input.Keys.SPACE:
-                    secondToLastPressSpace = lastPressSpace;
-                    lastPressSpace = TimeUtils.millis();
-                    jump = true;
-                    break;
+        public void connected(Controller controller) {
+
+        }
+
+        @Override
+        public void disconnected(Controller controller) {
+
+        }
+
+        @Override
+        public boolean buttonDown(Controller controller, int buttonCode) {
+            Gdx.app.log(controller.getName(), String.valueOf(buttonCode));
+            if (buttonCode == 96) {
+                jump = true;
             }
+            return true;
+        }
+
+        @Override
+        public boolean buttonUp(Controller controller, int buttonCode) {
+            if (buttonCode == 96) {
+                jump = false;
+            }
+            return true;
+        }
+
+        @Override
+        public boolean axisMoved(Controller controller, int axisCode, float value) {
+            Gdx.app.log(controller.getName() + "-axis:" + axisCode, String.valueOf(value));
+            if(axisCode == 6) {
+                if(value == 1) {
+                    moveRight = true;
+                } else if(value == -1) {
+                    moveLeft = true;
+                } else {
+                    moveRight = false;
+                    moveLeft = false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public boolean povMoved(Controller controller, int povCode, PovDirection value) {
+            Gdx.app.log(controller.getName() + "-pov:" + povCode, String.valueOf(value));
 
             return true;
         }
 
         @Override
+        public boolean xSliderMoved(Controller controller, int sliderCode, boolean value) {
+            return false;
+        }
+
+        @Override
+        public boolean ySliderMoved(Controller controller, int sliderCode, boolean value) {
+            return false;
+        }
+
+        @Override
+        public boolean accelerometerMoved(Controller controller, int accelerometerCode, Vector3 value) {
+            return false;
+        }
+    }
+
+    private class PlayerInputAdapter extends InputAdapter implements GameHud.GameHudListener {
+
+        @Override
+        public boolean keyDown(int keycode) {
+            if (keycode == rightKey) {
+                moveRight = true;
+            } else if (keycode == leftKey) {
+                moveLeft = true;
+            } else if (keycode == jumpKey) {
+                jump = true;
+            }
+            return true;
+        }
+
+        @Override
         public boolean keyUp(int keycode) {
-            switch (keycode) {
-                case Input.Keys.RIGHT:
-                case Input.Keys.D:
-                    moveRight = false;
-                    break;
-                case Input.Keys.LEFT:
-                case Input.Keys.A:
-                    moveLeft = false;
-                    break;
-                case Input.Keys.SPACE:
-                    jump = false;
-                    break;
+            if (keycode == rightKey) {
+                moveRight = false;
+            } else if (keycode == leftKey) {
+                moveLeft = false;
+            } else if (keycode == jumpKey) {
+                jump = false;
             }
             return true;
         }

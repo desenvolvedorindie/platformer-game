@@ -38,6 +38,11 @@ public class MovementSystem extends IteratingSystem {
         if (cRigidBody.isKinematic) {
             float delta = super.world.getDelta();
 
+            if (delta == 0) return;
+
+            if (delta > 0.1f)
+                delta = 0.1f;
+
             if (cRigidBody.useGravity) {
                 cRigidBody.velocity.y += world.getGravity() * cRigidBody.gravityMultiplier * delta;
             }

@@ -11,7 +11,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
     @Override
     protected IOSApplication createApplication() {
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
-        return new IOSApplication(PlatformerGame.getInstance(), config);
+        return new IOSApplication(new PlatformerGame(), config);
     }
 
     public static void main(String[] argv) {

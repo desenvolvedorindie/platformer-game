@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="80" height="45" tilewidth="16" tileheight="16" nextobjectid="1">
+ <tileset firstgid="1" source="../tilesets/materials.tsx"/>
+ <tileset firstgid="4" source="../tilesets/liquids.tsx"/>
+ <tileset firstgid="4" source="../tilesets/tools.tsx"/>
+ <layer name="background" width="80" height="45">
+  <data encoding="base64" compression="zlib">
+   eJztwQENAAAAwqD3T20PBxQAAAAAAAAAAAAAAAAA8GY4QAAB
+  </data>
+ </layer>
+ <layer name="foreground" width="80" height="45">
+  <data encoding="base64" compression="zlib">
+   eJztlNsKwkAMRGv9/3/2VYJzSRWKcA4ssmXtJpOZHgcAAAAAAAAAAAAAAAAAAAAA3MmDxbpxnWPNZ/Pc+969Y/7nFPfPWtx/N3eoflKvaj9rTPeqftV7t30qXa/sVb2tzkrj5rnr29XqvPiptnQueSB5w8211dL5Np1p6mkyoepMs3Z9t9lzuVC9OW+4+aV5OC+22jU5Vzpf8Uvj++R/N6N0rsmaO6s0dLNLPtnUv8lA+t64O5rcJi2dZ5M2jY6tl5Qf1bvT2VarZsauzpTxlMU2B43/v819o4/7XjQ+dl7a5tD13PjA+T7NyunXzHGrtfN+46/0ro0WSu+Nrq0ntj01s9j4L+0bHX7h69YbLqNOj7YGpeU2P2pmLstuxups61WXhea5066pp9HK/abZqRm1HkmzTzlMnn6yWKy/XS8F1wmm
+  </data>
+ </layer>
+</map>
