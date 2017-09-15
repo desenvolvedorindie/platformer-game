@@ -10,6 +10,9 @@ import com.artemis.managers.WorldSerializationManager;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.ai.pfa.PathSmoother;
+import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -17,8 +20,15 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.desenvolvedorindie.platformer.PlatformerGame;
+import com.desenvolvedorindie.platformer.ai.pathfind.TiledManhattanDistance;
+import com.desenvolvedorindie.platformer.ai.pathfind.TiledRaycastCollisionDetector;
+import com.desenvolvedorindie.platformer.ai.pathfind.TiledSmoothableGraphPath;
+import com.desenvolvedorindie.platformer.ai.pathfind.flat.FlatTiledGraph;
+import com.desenvolvedorindie.platformer.ai.pathfind.flat.FlatTiledNode;
 import com.desenvolvedorindie.platformer.block.Block;
 import com.desenvolvedorindie.platformer.block.water.Grid;
 import com.desenvolvedorindie.platformer.dictionary.Blocks;
@@ -42,32 +52,37 @@ public class World {
 
     public static final String NAME_BG = "background";
     public static final String NAME_FG = "foreground";
-
+    public FlatTiledGraph worldMap;
+    public TiledSmoothableGraphPath<FlatTiledNode> path;
+    public TiledManhattanDistance<FlatTiledNode> heuristic;
+    public IndexedAStarPathFinder<FlatTiledNode> pathFinder;
+    public PathSmoother<FlatTiledNode, Vector2> pathSmoother;
+    public Vector3 tmpUnprojection = new Vector3();
+    public int lastScreenX;
+    public int lastScreenY;
+    public int lastEndTileX;
+    public int lastEndTileY;
+    public int startTileX;
+    public int startTileY;
+    public boolean smooth = false;
     private EntityTrackerMainWindow entityTrackerWindow;
-
     private int[][][] map = new int[80][45][2];
-
     private Grid water = new Grid(80, 45);
-
     private com.artemis.World artemis;
-
     private int seaLevel = 7;
-
     private float gravity = -576;
-
     private int player;
-
     private boolean debug;
-
     private EntitiesFactory entitiesFactory;
-
     private CameraSystem cameraSystem;
-
     private CollisionDebugSystem collisionDebugSystem;
-
     private EntityDebugSystem entityDebugSystem;
+    private Camera camera;
 
     public World(OrthographicCamera camera, SpriteBatch batch, ShapeRenderer shapeRenderer, GameHud gameHud) {
+        this.camera = camera;
+
+
         WorldConfigurationBuilder worldConfigBuilder = new WorldConfigurationBuilder()
                 .with(Priority.HIGH,
                         new GroupManager(),
@@ -82,7 +97,7 @@ public class World {
                         new WorldSerializationManager()
                 )
                 .with(Priority.LOW,
-                        new TileRenderSystem(this, camera, batch),
+                        //new TileRenderSystem(this, camera, batch),
                         new SpriteRenderSystem(camera, batch),
                         new SpriterAnimationRenderSystem(camera, batch),
                         new WaterSystem(this, camera, shapeRenderer),
@@ -95,6 +110,7 @@ public class World {
             worldConfigBuilder.with(
                     Priority.LOW,
                     collisionDebugSystem = new CollisionDebugSystem(this, camera, shapeRenderer),
+                    new PathFindingDebugSystem(this, camera, shapeRenderer),
                     entityDebugSystem = new EntityDebugSystem(camera, 0)
             );
 
@@ -125,6 +141,19 @@ public class World {
         if (entityDebugSystem != null) {
             entityDebugSystem.setEnabled(false);
         }
+
+        lastEndTileX = -1;
+        lastEndTileY = -1;
+        startTileX = 1;
+        startTileY = 1;
+
+        worldMap = new FlatTiledGraph(this);
+
+        path = new TiledSmoothableGraphPath<FlatTiledNode>();
+        heuristic = new TiledManhattanDistance<FlatTiledNode>();
+        pathFinder = new IndexedAStarPathFinder<FlatTiledNode>(worldMap, true);
+        pathSmoother = new PathSmoother<FlatTiledNode, Vector2>(new TiledRaycastCollisionDetector<FlatTiledNode>(worldMap));
+
     }
 
     public static float mapToWorld(int mapCoordinate) {
@@ -159,7 +188,16 @@ public class World {
 
                     map[x][y][l] = Blocks.getIdByBlock(block);
                 }
+            }
+        }
 
+        updateWaterCells();
+        worldMap.init();
+    }
+
+    public void updateWaterCells() {
+        for (int x = 0; x < getWidth(); x++) {
+            for (int y = 0; y < getHeight(); y++) {
                 if (isSolid(x, y)) {
                     water.getCell(x, y).setType(CellType.SOLID);
                 }
@@ -201,6 +239,50 @@ public class World {
             }
         }
     }
+
+    private void updatePath(boolean forceUpdate) {
+        camera.unproject(tmpUnprojection.set(lastScreenX, lastScreenY, 0));
+        int tileX = World.worldToMap(tmpUnprojection.x);
+        int tileY = World.worldToMap(tmpUnprojection.y);
+        if (forceUpdate || tileX != lastEndTileX || tileY != lastEndTileY) {
+            FlatTiledNode startNode = worldMap.getNode(startTileX, startTileY);
+            FlatTiledNode endNode = worldMap.getNode(tileX, tileY);
+            if (forceUpdate || endNode.type == FlatTiledNode.TILE_FLOOR) {
+                if (endNode.type == FlatTiledNode.TILE_FLOOR) {
+                    lastEndTileX = tileX;
+                    lastEndTileY = tileY;
+                } else {
+                    endNode = worldMap.getNode(lastEndTileX, lastEndTileY);
+                }
+                path.clear();
+                worldMap.startNode = startNode;
+                long startTime = nanoTime();
+                pathFinder.searchNodePath(startNode, endNode, heuristic, path);
+                if (pathFinder.metrics != null) {
+                    float elapsed = (TimeUtils.nanoTime() - startTime) / 1000000f;
+                    System.out.println("----------------- Indexed A* Path Finder Metrics -----------------");
+                    System.out.println("Visited nodes................... = " + pathFinder.metrics.visitedNodes);
+                    System.out.println("Open list additions............. = " + pathFinder.metrics.openListAdditions);
+                    System.out.println("Open list peak.................. = " + pathFinder.metrics.openListPeak);
+                    System.out.println("Path finding elapsed time (ms).. = " + elapsed);
+                }
+                if (smooth) {
+                    startTime = nanoTime();
+                    pathSmoother.smoothPath(path);
+                    if (pathFinder.metrics != null) {
+                        float elapsed = (TimeUtils.nanoTime() - startTime) / 1000000f;
+                        System.out.println("Path smoothing elapsed time (ms) = " + elapsed);
+                    }
+                }
+            }
+        }
+    }
+
+
+    private long nanoTime() {
+        return pathFinder.metrics == null ? 0 : TimeUtils.nanoTime();
+    }
+
 
     public Block getBlock(int x, int y, int layer) {
         return Blocks.getBlockById(map[x][y][layer]);
@@ -330,6 +412,9 @@ public class World {
                 }
             }
         }
+
+        updateWaterCells();
+        worldMap.init();
     }
 
 }

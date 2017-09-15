@@ -1,5 +1,6 @@
 package com.desenvolvedorindie.platformer.ai.pathfind.flat;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.utils.Array;
 import com.desenvolvedorindie.platformer.ai.pathfind.TiledGraph;
@@ -25,9 +26,10 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
 
     @Override
     public void init() {
+        nodes.clear();
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
-                nodes.add(new FlatTiledNode(sizeY, x, y, world.isSolid(x, y) ? TiledNode.TILE_FLOOR : TiledNode.TILE_EMPTY, 4));
+                nodes.add(new FlatTiledNode(this, x, y, world.isSolid(x, y) ? TiledNode.TILE_FLOOR : TiledNode.TILE_EMPTY, 4));
             }
         }
 

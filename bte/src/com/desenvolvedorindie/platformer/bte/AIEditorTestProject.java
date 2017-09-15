@@ -1,4 +1,4 @@
-package io.piotrjastrzebski.bte.desktop;
+package com.desenvolvedorindie.platformer.bte;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -24,12 +24,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.desenvolvedorindie.platformer.ai.btree.dog.*;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisDialog;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import io.piotrjastrzebski.bte.AIEditor;
 import io.piotrjastrzebski.bte.EditorBehaviourTreeLibrary;
-import io.piotrjastrzebski.bte.desktop.dog.*;
 
 /**
  * Created by EvilEntity on 04/02/2016.

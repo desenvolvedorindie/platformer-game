@@ -26,16 +26,16 @@ import com.desenvolvedorindie.platformer.ai.pathfind.TiledNode;
  * @author davebaol */
 public class FlatTiledNode extends TiledNode<FlatTiledNode> {
 
-	private int height;
+	private FlatTiledGraph tiledGraph;
 
-	public FlatTiledNode (int height, int x, int y, int type, int connectionCapacity) {
+	public FlatTiledNode (FlatTiledGraph tiledGraph, int x, int y, int type, int connectionCapacity) {
 		super(x, y, type, new Array<Connection<FlatTiledNode>>(connectionCapacity));
-		this.height = height;
+		this.tiledGraph = tiledGraph;
 	}
 
 	@Override
 	public int getIndex () {
-		return x * height + y;
+		return x * tiledGraph.getHeight() + y;
 	}
 
 }

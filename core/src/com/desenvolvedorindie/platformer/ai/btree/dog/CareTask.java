@@ -14,35 +14,36 @@
  * limitations under the License.
  ******************************************************************************/
 
-package io.piotrjastrzebski.bte.desktop.dog;
+package com.desenvolvedorindie.platformer.ai.btree.dog;
 
 import com.badlogic.gdx.ai.btree.LeafTask;
 import com.badlogic.gdx.ai.btree.Task;
+import com.badlogic.gdx.ai.btree.annotation.TaskAttribute;
 import io.piotrjastrzebski.bte.TaskComment;
 
 /** @author implicit-invocation
  * @author davebaol */
-@TaskComment("zZz for b bit")
-public class RestTask extends LeafTask<Dog> {
+@TaskComment("Gotta pee!")
+public class CareTask extends LeafTask<Dog> {
 
-	@Override
-	public void start () {
-		getObject().brainLog("YAWN - So tired...");
-	}
+	@TaskComment("how often?")
+	@TaskAttribute(required = true) public float urgentProb = 0.8f;
 
 	@Override
 	public Status execute () {
-		getObject().brainLog("zz zz zz");
-		return Status.RUNNING;
-	}
-
-	@Override
-	public void end () {
-		getObject().brainLog("SOB - Time to wake up");
+		if (Math.random() < urgentProb) {
+			return Status.SUCCEEDED;
+		}
+		Dog dog = getObject();
+		dog.brainLog("GASP - Something urgent :/");
+		return Status.FAILED;
 	}
 
 	@Override
 	protected Task<Dog> copyTo (Task<Dog> task) {
+		CareTask care = (CareTask)task;
+		care.urgentProb = urgentProb;
+
 		return task;
 	}
 

@@ -2,6 +2,7 @@ package com.desenvolvedorindie.platformer.entity.system;
 
 import com.artemis.BaseSystem;
 import com.artemis.ComponentMapper;
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
@@ -43,7 +44,9 @@ public class CameraSystem extends BaseSystem {
 
         cameraZoom = new CameraZoom(ZOOM_LEVELS, 1f);
 
-        cameraZoom.zoomIn();
+        if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
+            cameraZoom.zoomIn();
+        }
 
         cameraFollow = new CameraFollowConstraint(playerPositionV3, 1f);
 

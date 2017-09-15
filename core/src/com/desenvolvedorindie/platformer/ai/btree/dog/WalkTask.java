@@ -14,45 +14,41 @@
  * limitations under the License.
  ******************************************************************************/
 
-package io.piotrjastrzebski.bte.desktop.dog;
+package com.desenvolvedorindie.platformer.ai.btree.dog;
 
 import com.badlogic.gdx.ai.btree.LeafTask;
 import com.badlogic.gdx.ai.btree.Task;
-import com.badlogic.gdx.ai.btree.annotation.TaskAttribute;
-import com.badlogic.gdx.ai.utils.random.ConstantIntegerDistribution;
-import com.badlogic.gdx.ai.utils.random.IntegerDistribution;
 import io.piotrjastrzebski.bte.TaskComment;
 
 /** @author implicit-invocation
  * @author davebaol */
-@TaskComment("Dog barks # times")
-public class BarkTask extends LeafTask<Dog> {
+@TaskComment("Walk around for b bit")
+public class WalkTask extends LeafTask<Dog> {
 
-	@TaskAttribute
-	@TaskComment(value = "# of barks", skipFieldName = false)
-	public IntegerDistribution times = ConstantIntegerDistribution.ONE;
-
-	private int t;
+	private int i = 0;
 
 	@Override
 	public void start () {
-		super.start();
-		t = times.nextInt();
+		i = 0;
+		Dog dog = getObject();
+		dog.startWalking();
 	}
 
 	@Override
 	public Status execute () {
+		i++;
 		Dog dog = getObject();
-		for (int i = 0; i < t; i++)
-			dog.bark();
-		return Status.SUCCEEDED;
+		dog.randomlyWalk();
+		return i < 3 ? Status.RUNNING : Status.SUCCEEDED;
+	}
+
+	@Override
+	public void end () {
+		getObject().stopWalking();
 	}
 
 	@Override
 	protected Task<Dog> copyTo (Task<Dog> task) {
-		BarkTask bark = (BarkTask)task;
-		bark.times = times;
-
 		return task;
 	}
 

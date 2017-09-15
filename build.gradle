@@ -108,7 +108,6 @@ project(":bte") {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.github.piotr-j.bte2:bte:$bte2Version"
         compile "com.github.piotr-j.bte2:bte-window:$bte2Version"
     }
 }
@@ -207,6 +206,7 @@ project(":core") {
         //compile "net.fbridault.eeel:artemis-odb-eeel:$artemisEEELVersion"
         compile "net.namekdev.entity_tracker:artemis-entity-tracker:$artemisEntityTrackerVersion"
         compile "net.namekdev.entity_tracker:artemis-entity-tracker-gui:$artemisEntityTrackerVersion"
+        compile "com.github.piotr-j.bte2:bte:$bte2Version"
         compile "net.dermetfan.libgdx-utils:libgdx-utils:$gdxUtilsVersion"
         compile "net.dermetfan.libgdx-utils:libgdx-utils-box2d:$gdxUtilsVersion"
         compile "net.spookygames.gdx:gdx-spriter:$gdxSpriterVersion"

@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package io.piotrjastrzebski.bte.desktop.dog;
+package com.desenvolvedorindie.platformer.ai.btree.dog;
 
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.btree.BehaviorTree;

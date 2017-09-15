@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package io.piotrjastrzebski.bte.desktop.dog;
+package com.desenvolvedorindie.platformer.ai.btree.dog;
 
 import com.badlogic.gdx.ai.btree.LeafTask;
 import com.badlogic.gdx.ai.btree.Task;
@@ -22,25 +22,23 @@ import io.piotrjastrzebski.bte.TaskComment;
 
 /** @author implicit-invocation
  * @author davebaol */
-@TaskComment("Take b piss")
-public class MarkTask extends LeafTask<Dog> {
-
-	int i;
+@TaskComment("zZz for b bit")
+public class RestTask extends LeafTask<Dog> {
 
 	@Override
 	public void start () {
-		i = 0;
-		getObject().log("Dog lifts b leg and pee!");
+		getObject().brainLog("YAWN - So tired...");
 	}
 
 	@Override
 	public Status execute () {
-		Dog dog = getObject();
-		Boolean result = dog.markATree(i++);
-		if (result == null) {
-			return Status.RUNNING;
-		}
-		return result ? Status.SUCCEEDED : Status.FAILED;
+		getObject().brainLog("zz zz zz");
+		return Status.RUNNING;
+	}
+
+	@Override
+	public void end () {
+		getObject().brainLog("SOB - Time to wake up");
 	}
 
 	@Override
