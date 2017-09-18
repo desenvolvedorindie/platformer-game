@@ -12,7 +12,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -24,9 +23,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.desenvolvedorindie.platformer.PlatformerGame;
-import com.desenvolvedorindie.platformer.ai.pathfind.TiledManhattanDistance;
-import com.desenvolvedorindie.platformer.ai.pathfind.TiledRaycastCollisionDetector;
-import com.desenvolvedorindie.platformer.ai.pathfind.TiledSmoothableGraphPath;
+import com.desenvolvedorindie.platformer.ai.pathfind.*;
 import com.desenvolvedorindie.platformer.ai.pathfind.flat.FlatTiledGraph;
 import com.desenvolvedorindie.platformer.ai.pathfind.flat.FlatTiledNode;
 import com.desenvolvedorindie.platformer.block.Block;
@@ -34,7 +31,6 @@ import com.desenvolvedorindie.platformer.block.water.Grid;
 import com.desenvolvedorindie.platformer.dictionary.Blocks;
 import com.desenvolvedorindie.platformer.entity.EntitiesFactory;
 import com.desenvolvedorindie.platformer.entity.system.*;
-import com.desenvolvedorindie.platformer.scene2d.GameHud;
 import net.mostlyoriginal.api.event.common.EventSystem;
 import net.namekdev.entity_tracker.EntityTracker;
 import net.namekdev.entity_tracker.ui.EntityTrackerMainWindow;
@@ -45,19 +41,22 @@ import java.util.Random;
 import static com.artemis.WorldConfigurationBuilder.Priority;
 import static com.desenvolvedorindie.platformer.block.water.Cell.CellType;
 
-public class World {
+public class World implements IWorld {
+
+    public static final int CHUNK_WIDTH = 128;
+    public static final int CHUNK_HEIGHT = 512;
 
     public static final int BG = 0;
     public static final int FG = 1;
 
     public static final String NAME_BG = "background";
     public static final String NAME_FG = "foreground";
+    private final PathFindingDebugSystem pathFindingDebugSystem;
     public FlatTiledGraph worldMap;
     public TiledSmoothableGraphPath<FlatTiledNode> path;
     public TiledManhattanDistance<FlatTiledNode> heuristic;
     public IndexedAStarPathFinder<FlatTiledNode> pathFinder;
     public PathSmoother<FlatTiledNode, Vector2> pathSmoother;
-    public Vector3 tmpUnprojection = new Vector3();
     public int lastScreenX;
     public int lastScreenY;
     public int lastEndTileX;
@@ -65,31 +64,28 @@ public class World {
     public int startTileX;
     public int startTileY;
     public boolean smooth = false;
+    public int[][] mapPath = new int[CHUNK_WIDTH][CHUNK_HEIGHT];
     private EntityTrackerMainWindow entityTrackerWindow;
-    private int[][][] map = new int[80][45][2];
-    private Grid water = new Grid(80, 45);
+    private int[][][] map = new int[CHUNK_WIDTH][CHUNK_HEIGHT][2];
+    private Rectangle[] collisionBoxes = new Rectangle[CHUNK_WIDTH * CHUNK_HEIGHT];
+    private Grid water = new Grid(CHUNK_WIDTH, CHUNK_HEIGHT);
     private com.artemis.World artemis;
-    private int seaLevel = 7;
+    private int seaLevel = 318;
     private float gravity = -576;
     private int player;
-    private boolean debug;
     private EntitiesFactory entitiesFactory;
     private CameraSystem cameraSystem;
     private CollisionDebugSystem collisionDebugSystem;
     private EntityDebugSystem entityDebugSystem;
-    private Camera camera;
 
-    public World(OrthographicCamera camera, SpriteBatch batch, ShapeRenderer shapeRenderer, GameHud gameHud) {
-        this.camera = camera;
-
-
+    public World(OrthographicCamera camera, SpriteBatch batch, ShapeRenderer shapeRenderer) {
         WorldConfigurationBuilder worldConfigBuilder = new WorldConfigurationBuilder()
                 .with(Priority.HIGH,
                         new GroupManager(),
                         new PlayerManager(),
                         new TagManager(),
                         new EventSystem(),
-                        new PlayerControllerSystem(gameHud),
+                        new PlayerControllerSystem(),
                         new MovementSystem(this),
                         new StateSystem(),
                         new OperationSystem(),
@@ -97,7 +93,7 @@ public class World {
                         new WorldSerializationManager()
                 )
                 .with(Priority.LOW,
-                        //new TileRenderSystem(this, camera, batch),
+                        new TileRenderSystem(this, camera, batch),
                         new SpriteRenderSystem(camera, batch),
                         new SpriterAnimationRenderSystem(camera, batch),
                         new WaterSystem(this, camera, shapeRenderer),
@@ -110,7 +106,7 @@ public class World {
             worldConfigBuilder.with(
                     Priority.LOW,
                     collisionDebugSystem = new CollisionDebugSystem(this, camera, shapeRenderer),
-                    new PathFindingDebugSystem(this, camera, shapeRenderer),
+                    pathFindingDebugSystem = new PathFindingDebugSystem(this, camera, shapeRenderer),
                     entityDebugSystem = new EntityDebugSystem(camera, 0)
             );
 
@@ -135,25 +131,21 @@ public class World {
         player = entitiesFactory.createPlayer(200, mapToWorld(getHeight() - 3));
 
         if (collisionDebugSystem != null) {
-            collisionDebugSystem.setEnabled(false);
+            collisionDebugSystem.setEnabled(true);
         }
 
         if (entityDebugSystem != null) {
             entityDebugSystem.setEnabled(false);
         }
 
+        if (pathFindingDebugSystem != null) {
+            pathFindingDebugSystem.setEnabled(false);
+        }
+
         lastEndTileX = -1;
         lastEndTileY = -1;
         startTileX = 1;
         startTileY = 1;
-
-        worldMap = new FlatTiledGraph(this);
-
-        path = new TiledSmoothableGraphPath<FlatTiledNode>();
-        heuristic = new TiledManhattanDistance<FlatTiledNode>();
-        pathFinder = new IndexedAStarPathFinder<FlatTiledNode>(worldMap, true);
-        pathSmoother = new PathSmoother<FlatTiledNode, Vector2>(new TiledRaycastCollisionDetector<FlatTiledNode>(worldMap));
-
     }
 
     public static float mapToWorld(int mapCoordinate) {
@@ -182,7 +174,7 @@ public class World {
                         if (l == 0) {
                             block = Blocks.DIRT;
                         } else {
-                            block = random.nextInt(100) > 95 ? Blocks.DIRT : Blocks.AIR;
+                            block = random.nextInt(100) > 90 ? Blocks.DIRT : Blocks.AIR;
                         }
                     }
 
@@ -191,8 +183,90 @@ public class World {
             }
         }
 
+        init();
+    }
+
+    private boolean isRealFloor(int x, int y) {
+        return !isSolid(x, y) && isSolid(x, y - 1);
+    }
+
+    private void init() {
+        for (int x = 0; x < getWidth(); x++) {
+            int idx = x * getHeight();
+
+            for (int y = 0; y < getHeight(); y++) {
+                collisionBoxes[idx + y] = getBlock(x, y, FG).getTileRectangle(this, x, y);
+            }
+        }
+
         updateWaterCells();
+
+        int jumpSize = 1;
+
+        for (int x = 0; x < getWidth(); x++) {
+            for (int y = 0; y < getHeight(); y++) {
+                if (isRealFloor(x, y)) {
+                    mapPath[x][y] = TiledNode.TILE_FLOOR;
+                } else if (!isSolid(x, y)) {
+                    boolean isReachable = false;
+                    for (int j = y; j >= y - jumpSize; j--) {
+                        if (isRealFloor(x, j)) {
+                            isReachable = true;
+                            break;
+                        }
+                    }
+                    if (isReachable)
+                        mapPath[x][y] = TiledNode.TILE_FLOOR;
+                }
+            }
+        }
+
+        int yy;
+
+        /*
+        for (int x = 0; x < getWidth(); x++) {
+            for (int y = 0; y < getHeight(); y++) {
+                if ((!isSolid(x + 1, y)) || !isSolid(x - 1, y)) {
+                    yy = y;
+                    while (yy >= 0) {
+                        if (mapPath[x][yy] == TiledNode.TILE_EMPTY && !isSolid(x, yy)) {
+                            mapPath[x][yy] = TiledNode.TILE_FLOOR;
+                        } else {
+                            break;
+                        }
+                        yy--;
+                    }
+                }
+            }
+        }
+        */
+
+        for (int x = 0; x < getWidth(); x++) {
+            for (int y = 0; y < getHeight(); y++) {
+                if (mapPath[x][y] == TiledNode.TILE_FLOOR) {
+                    for (int xx = x - 1; xx <= x + 1; xx++) {
+                        for (yy = y - 1; yy <= y + 1; yy++) {
+                            if (isSolid(xx, yy) && isValid(xx, yy))
+                                if (mapPath[xx][yy] == TiledNode.TILE_EMPTY) mapPath[xx][yy] = TiledNode.TILE_WALL;
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int x = 0; x < getWidth(); x++) {
+            for (int y = 0; y < getHeight(); y++) {
+                mapPath[x][y] = isSolid(x, y) ? TiledNode.TILE_WALL : TiledNode.TILE_FLOOR;
+            }
+        }
+
+        worldMap = new FlatTiledGraph(this);
         worldMap.init();
+
+        path = new TiledSmoothableGraphPath<FlatTiledNode>();
+        heuristic = new TiledManhattanDistance<FlatTiledNode>();
+        pathFinder = new IndexedAStarPathFinder<FlatTiledNode>(worldMap, true);
+        pathSmoother = new PathSmoother<FlatTiledNode, Vector2>(new TiledRaycastCollisionDetector<FlatTiledNode>(worldMap));
     }
 
     public void updateWaterCells() {
@@ -215,6 +289,10 @@ public class World {
     }
 
     private void debug() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F9)) {
+            pathFindingDebugSystem.setEnabled(!pathFindingDebugSystem.isEnabled());
+        }
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.F10)) {
             cameraSystem.setDebug(!cameraSystem.isDebug());
         }
@@ -240,11 +318,10 @@ public class World {
         }
     }
 
-    private void updatePath(boolean forceUpdate) {
-        camera.unproject(tmpUnprojection.set(lastScreenX, lastScreenY, 0));
-        int tileX = World.worldToMap(tmpUnprojection.x);
-        int tileY = World.worldToMap(tmpUnprojection.y);
-        if (forceUpdate || tileX != lastEndTileX || tileY != lastEndTileY) {
+    public void updatePath(boolean forceUpdate) {
+        int tileX = lastScreenX;
+        int tileY = lastScreenY;
+        if (forceUpdate || tileX != lastEndTileX || tileY != lastEndTileY && lastEndTileX >= 0 && lastEndTileY >= 0) {
             FlatTiledNode startNode = worldMap.getNode(startTileX, startTileY);
             FlatTiledNode endNode = worldMap.getNode(tileX, tileY);
             if (forceUpdate || endNode.type == FlatTiledNode.TILE_FLOOR) {
@@ -257,6 +334,8 @@ public class World {
                 path.clear();
                 worldMap.startNode = startNode;
                 long startTime = nanoTime();
+                Gdx.app.log("Start Tile", startNode.x + ", " + startNode.y);
+                Gdx.app.log("Last Screen", endNode.x + ", " + endNode.y);
                 pathFinder.searchNodePath(startNode, endNode, heuristic, path);
                 if (pathFinder.metrics != null) {
                     float elapsed = (TimeUtils.nanoTime() - startTime) / 1000000f;
@@ -283,7 +362,6 @@ public class World {
         return pathFinder.metrics == null ? 0 : TimeUtils.nanoTime();
     }
 
-
     public Block getBlock(int x, int y, int layer) {
         return Blocks.getBlockById(map[x][y][layer]);
     }
@@ -298,6 +376,11 @@ public class World {
 
     public int getHeight() {
         return map[0].length;
+    }
+
+    @Override
+    public int getType(int x, int y) {
+        return mapPath[x][y];
     }
 
     public int getLayers() {
@@ -343,13 +426,7 @@ public class World {
     }
 
     public Rectangle getTileRectangle(int x, int y) {
-        Rectangle rectangle = null;
-
-        if (isValid(x, y) && isSolid(x, y)) {
-            return new Rectangle(mapToWorld(x), mapToWorld(y), Block.TILE_SIZE, Block.TILE_SIZE);
-        }
-
-        return rectangle;
+        return collisionBoxes[x * getHeight() + y];
     }
 
     public boolean tileCollisionAtPoint(float x, float y) {
@@ -413,8 +490,7 @@ public class World {
             }
         }
 
-        updateWaterCells();
-        worldMap.init();
+        init();
     }
 
 }

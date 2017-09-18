@@ -22,7 +22,7 @@ import com.desenvolvedorindie.platformer.ai.pathfind.TiledGraph;
 import com.desenvolvedorindie.platformer.ai.pathfind.TiledNode;
 
 /** A node for a {@link FlatTiledGraph}.
- * 
+ *
  * @author davebaol */
 public class FlatTiledNode extends TiledNode<FlatTiledNode> {
 

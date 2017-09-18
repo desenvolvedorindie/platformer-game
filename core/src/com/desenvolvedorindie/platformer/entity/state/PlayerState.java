@@ -30,7 +30,8 @@ public enum PlayerState implements State<Entity> {
 
             SpriterAnimationComponent cSpriterAnimation = entity.getComponent(SpriterAnimationComponent.class);
 
-            cSpriterAnimation.spriterAnimator.play("idle");
+            if (cSpriterAnimation != null)
+                cSpriterAnimation.spriterAnimator.play("idle");
         }
     },
     Walk {
@@ -56,7 +57,9 @@ public enum PlayerState implements State<Entity> {
             super.enter(entity);
 
             SpriterAnimationComponent cSpriterAnimation = entity.getComponent(SpriterAnimationComponent.class);
-            cSpriterAnimation.spriterAnimator.play("walk");
+
+            if (cSpriterAnimation != null)
+                cSpriterAnimation.spriterAnimator.play("walk");
         }
     },
     Jump {
@@ -72,7 +75,8 @@ public enum PlayerState implements State<Entity> {
 
             if (cRigidBody.velocity.y < 0) {
                 if (!cPlayer.alreadyFalling) {
-                    cSpriterAnimation.spriterAnimator.play("fall_start");
+                    if (cSpriterAnimation != null)
+                        cSpriterAnimation.spriterAnimator.play("fall_start");
                     cPlayer.alreadyFalling = true;
                 }
             }
@@ -103,9 +107,11 @@ public enum PlayerState implements State<Entity> {
             SpriterAnimationComponent cSpriterAnimation = entity.getComponent(SpriterAnimationComponent.class);
 
             if (cRigidBody.velocity.y > 0) {
-                cSpriterAnimation.spriterAnimator.play("jump_start");
+                if (cSpriterAnimation != null)
+                    cSpriterAnimation.spriterAnimator.play("jump_start");
             } else if (cRigidBody.velocity.y < 0) {
-                cSpriterAnimation.spriterAnimator.play("fall_start");
+                if (cSpriterAnimation != null)
+                    cSpriterAnimation.spriterAnimator.play("fall_start");
             }
         }
     };

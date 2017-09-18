@@ -23,7 +23,6 @@ public class InputSequence {
 
         if (index > 0) {
             time += Gdx.graphics.getDeltaTime();
-            Gdx.app.log("Sequence", String.valueOf(time));
         }
 
         if (sequence[index].pressed()) {
@@ -32,7 +31,6 @@ public class InputSequence {
                 reset();
             }
         } else if (sequence[index].anyPressed()) {
-            Gdx.app.log("Sequence", "anyPressed");
             reset();
         }
 

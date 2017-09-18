@@ -37,7 +37,7 @@ public class EntitiesFactory {
 
         playerArchetype = new ArchetypeBuilder()
                 .add(TransformComponent.class)
-                .add(SpriterAnimationComponent.class)
+                //.add(SpriterAnimationComponent.class)
                 .add(StateComponent.class)
                 .add(PlayerComponent.class)
                 .add(JumpComponent.class)
@@ -54,12 +54,15 @@ public class EntitiesFactory {
 
         Texture texture = Assets.manager.get(Assets.player);
 
-        int width = texture.getWidth();
-        int height = texture.getHeight();
+        int width = 14;
+        int height = 14;
 
+        /*
         SpriterAnimationComponent cSpriterAnimation = mSpriterAnimationComponent.get(entity);
         cSpriterAnimation.spriterAnimator = new SpriterAnimator(Assets.manager.get(Assets.grayGuy).entities.first());
         cSpriterAnimation.spriterAnimator.play("idle");
+        cSpriterAnimation.spriterAnimator.addAnimationListener(new PlayerSpriterAnimationListener());
+        */
 
         cTransform.scaleX = cTransform.scaleY = 0.17f;
 
@@ -76,7 +79,6 @@ public class EntitiesFactory {
         cCollidable.collisionBox.setPosition(new Vector2(x, y));
         cCollidable.collisionBox.setSize(width, height);
 
-        cSpriterAnimation.spriterAnimator.addAnimationListener(new PlayerSpriterAnimationListener());
 
         return entity;
     }

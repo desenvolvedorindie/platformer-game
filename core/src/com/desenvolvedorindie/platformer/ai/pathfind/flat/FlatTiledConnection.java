@@ -2,6 +2,7 @@ package com.desenvolvedorindie.platformer.ai.pathfind.flat;
 
 import com.badlogic.gdx.ai.pfa.DefaultConnection;
 
+
 public class FlatTiledConnection extends DefaultConnection<FlatTiledNode> {
 
     static final float NON_DIAGONAL_COST = (float) Math.sqrt(2);

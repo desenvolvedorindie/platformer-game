@@ -44,13 +44,14 @@ public class GameScreen extends ScreenAdapter {
         stage = new Stage(new FitViewport(PlatformerGame.UI_WIDTH, PlatformerGame.UI_HEIGHT, uiCamera), batch);
         stage.setDebugAll(PlatformerGame.DEBUG);
         skin = new Skin(Assets.manager.get(Assets.ui));
-        gameHud = new GameHud(skin, Gdx.app.getType().equals(Application.ApplicationType.Android) || PlatformerGame.DEBUG);
+        boolean includeMobile = false;// Gdx.app.getType().equals(Application.ApplicationType.Android) || PlatformerGame.DEBUG;
+        gameHud = new GameHud(skin, includeMobile);
 
-        stage.addActor(gameHud);
+        //stage.addActor(gameHud);
 
-        world = new World(camera, batch, shapeRenderer, gameHud);
-        //world.regenerate();
-        world.load(tiledMap);
+        world = new World(camera, batch, shapeRenderer);
+        world.regenerate();
+        //world.load(tiledMap);
 
         InputProcessor playerInput = world.getArtemis().getSystem(PlayerControllerSystem.class).getPlayerInputAdapter();
         Gdx.input.setInputProcessor(new InputMultiplexer(stage, playerInput));

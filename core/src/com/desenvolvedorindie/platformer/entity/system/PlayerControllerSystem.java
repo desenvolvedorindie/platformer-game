@@ -34,7 +34,7 @@ public class PlayerControllerSystem extends IteratingSystem {
 
     private PlayerInputAdapter playerInputAdapter;
 
-    public PlayerControllerSystem(GameHud gameHud) {
+    public PlayerControllerSystem() {
         super(Aspect.all(PlayerComponent.class, JumpComponent.class));
 
         Controllers.addListener(new PlayerControllerListener());

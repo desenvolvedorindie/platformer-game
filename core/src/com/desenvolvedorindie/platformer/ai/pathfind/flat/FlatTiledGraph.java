@@ -3,52 +3,55 @@ package com.desenvolvedorindie.platformer.ai.pathfind.flat;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.utils.Array;
+import com.desenvolvedorindie.platformer.ai.pathfind.IWorld;
 import com.desenvolvedorindie.platformer.ai.pathfind.TiledGraph;
-import com.desenvolvedorindie.platformer.ai.pathfind.TiledNode;
-import com.desenvolvedorindie.platformer.world.World;
 
 public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
-    public int sizeX; // 200; //100;
-    public int sizeY; // 120; //60;
     public boolean diagonal;
     public FlatTiledNode startNode;
     protected Array<FlatTiledNode> nodes;
-    protected World world;
+    protected IWorld world;
 
-    public FlatTiledGraph(World world) {
-        sizeX = world.getWidth();
-        sizeY = world.getHeight();
+    public FlatTiledGraph(IWorld world) {
         this.world = world;
-        this.nodes = new Array<FlatTiledNode>(sizeX * sizeY);
-        this.diagonal = false;
+        this.nodes = new Array<FlatTiledNode>(world.getWidth() * world.getHeight());
+        this.diagonal = true;
         this.startNode = null;
     }
 
     @Override
     public void init() {
         nodes.clear();
-        for (int x = 0; x < sizeX; x++) {
-            for (int y = 0; y < sizeY; y++) {
-                nodes.add(new FlatTiledNode(this, x, y, world.isSolid(x, y) ? TiledNode.TILE_FLOOR : TiledNode.TILE_EMPTY, 4));
+        for (int x = 0; x < world.getWidth(); x++) {
+            for (int y = 0; y < world.getHeight(); y++) {
+                nodes.add(new FlatTiledNode(this, x, y, world.getType(x, y), 4));
             }
         }
 
         // Each node has up to 4 neighbors, therefore no diagonal movement is possible
-        for (int x = 0; x < sizeX; x++) {
-            int idx = x * sizeY;
-            for (int y = 0; y < sizeY; y++) {
+        for (int x = 0; x < world.getWidth(); x++) {
+            int idx = x * world.getHeight();
+            for (int y = 0; y < world.getHeight(); y++) {
                 FlatTiledNode n = nodes.get(idx + y);
-                if (x > 0) addConnection(n, -1, 0);
-                if (y > 0) addConnection(n, 0, -1);
-                if (x < sizeX - 1) addConnection(n, 1, 0);
-                if (y < sizeY - 1) addConnection(n, 0, 1);
+                if (x > 0) {
+                    addConnection(n, -1, 0);
+                }
+                if (y > 0) {
+                    addConnection(n, 0, -1);
+                }
+                if (x < world.getWidth() - 1) {
+                    addConnection(n, 1, 0);
+                }
+                if (y < world.getHeight() - 1) {
+                    addConnection(n, 0, 1);
+                }
             }
         }
     }
 
     @Override
     public FlatTiledNode getNode(int x, int y) {
-        return nodes.get(x * sizeY + y);
+        return nodes.get(x * world.getHeight() + y);
     }
 
     @Override
@@ -58,12 +61,12 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
 
     @Override
     public int getWidth() {
-        return sizeX;
+        return world.getWidth();
     }
 
     @Override
     public int getHeight() {
-        return sizeY;
+        return world.getHeight();
     }
 
     @Override
@@ -83,7 +86,10 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
 
     private void addConnection(FlatTiledNode n, int xOffset, int yOffset) {
         FlatTiledNode target = getNode(n.x + xOffset, n.y + yOffset);
-        if (target.type == FlatTiledNode.TILE_FLOOR) n.getConnections().add(new FlatTiledConnection(this, n, target));
+
+        if (target.type == FlatTiledNode.TILE_FLOOR) {
+            n.getConnections().add(new FlatTiledConnection(this, n, target));
+        }
     }
 
 }

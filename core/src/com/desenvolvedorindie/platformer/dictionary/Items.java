@@ -20,7 +20,7 @@ public class Items {
     public static final Item SWORD;
 
     static {
-        SWORD = register(1, new Item(new SpriteDrawable(new Sprite(Assets.manager.get(Assets.sword)))));
+        SWORD = register(1, new Item(new SpriteDrawable(new Sprite(Assets.manager.get(Assets.ITEM_SWORD)))));
     }
 
     public static Item getBlockById(int id) {

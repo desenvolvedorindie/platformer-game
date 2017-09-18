@@ -3,6 +3,8 @@ package com.desenvolvedorindie.platformer.dictionary;
 import com.badlogic.gdx.utils.IntMap;
 import com.desenvolvedorindie.platformer.block.Block;
 import com.desenvolvedorindie.platformer.block.BlockAir;
+import com.desenvolvedorindie.platformer.block.SlabBlock;
+import com.desenvolvedorindie.platformer.block.SlopeBlock;
 import com.desenvolvedorindie.platformer.resource.Assets;
 
 import java.util.HashMap;
@@ -28,11 +30,17 @@ public class Blocks {
 
     public static final Block OBSIDIAN;
 
+    public static final Block SLAB;
+
+    public static final Block SLOPE;
+
     static {
         AIR = register(AIR_NAME, AIR_ID, new BlockAir());
-        DIRT = register("dirt", 1, new Block(Assets.manager.get(Assets.dirt)));
-        COBBLESTONE = register("cobblestone", 2, new Block(Assets.manager.get(Assets.cobblestone)));
-        OBSIDIAN = register("obsidian", 3, new Block(Assets.manager.get(Assets.obsidian)));
+        DIRT = register("dirt", 1, new Block(Assets.manager.get(Assets.BLOCK_DIRT)));
+        COBBLESTONE = register("cobblestone", 2, new Block(Assets.manager.get(Assets.BLOCK_COBBLESTONE)));
+        OBSIDIAN = register("obsidian", 3, new Block(Assets.manager.get(Assets.BLOCK_OBSIDIAN)));
+        SLAB = register("slab", 4, new SlabBlock(Assets.manager.get(Assets.BLOCK_SLAB)));
+        SLOPE = register("slope", 5, new SlopeBlock(Assets.manager.get(Assets.BLOCK_SLOPE)));
     }
 
     public static Block getBlockById(int id) {
