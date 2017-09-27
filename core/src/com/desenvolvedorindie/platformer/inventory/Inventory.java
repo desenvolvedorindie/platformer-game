@@ -1,6 +1,7 @@
 package com.desenvolvedorindie.platformer.inventory;
 
 import com.artemis.Entity;
+import com.badlogic.gdx.utils.Array;
 import com.desenvolvedorindie.platformer.item.Item;
 import com.desenvolvedorindie.platformer.item.ItemStack;
 
@@ -9,25 +10,30 @@ import java.util.List;
 
 public class Inventory implements IInventory {
 
-    protected final ItemStack[] inventory;
+    protected final Array<ItemStack> inventory;
 
     protected List<IInventoryChangedListener> changeListeners;
 
-    public Inventory(int slotsCount) {
-        inventory = new ItemStack[slotsCount];
+    private String title;
+
+    public Inventory(String title, int slotsCount) {
+        this.title = title;
+
+        inventory = new Array<>(slotsCount);
+
         for (int i = 0; i < slotsCount; i++) {
-            inventory[i] = new ItemStack(null, 0);
+            inventory.add(new ItemStack(null, 0));
         }
     }
 
     @Override
     public int getSize() {
-        return inventory.length;
+        return inventory.size;
     }
 
     @Override
     public boolean removeItemStack(int index, int count) {
-        ItemStack itemStack = inventory[index];
+        ItemStack itemStack = inventory.get(index);
         if (itemStack.stack < count) {
             return false;
         }
@@ -37,8 +43,8 @@ public class Inventory implements IInventory {
 
     @Override
     public ItemStack removeItemStack(int index) {
-        ItemStack itemStack = inventory[index];
-        inventory[index] = null;
+        ItemStack itemStack = inventory.get(index);
+        itemStack.setItem(null);
         return itemStack;
     }
 
@@ -49,7 +55,7 @@ public class Inventory implements IInventory {
 
     @Override
     public void setItemStack(int index, ItemStack itemStack) {
-        inventory[index] = itemStack;
+        inventory.set(index, itemStack);
     }
 
     @Override
@@ -75,7 +81,7 @@ public class Inventory implements IInventory {
     @Override
     public boolean isFull() {
         for (int i = 0; i < getSize(); i++) {
-            if (inventory[i] == null) {
+            if (inventory.get(i) == null) {
                 return false;
             }
         }
@@ -86,7 +92,7 @@ public class Inventory implements IInventory {
     @Override
     public void clear() {
         for (int i = 0; i < getSize(); i++) {
-            inventory[i] = null;
+            inventory.set(i, null);
         }
     }
 

@@ -1,12 +1,8 @@
 package com.desenvolvedorindie.platformer;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.controllers.Controller;
-import com.badlogic.gdx.controllers.Controllers;
-import com.badlogic.gdx.physics.box2d.Box2D;
 import com.desenvolvedorindie.platformer.graphics.FPSLogger;
 import com.desenvolvedorindie.platformer.input.GameInput;
 import com.desenvolvedorindie.platformer.resource.Assets;

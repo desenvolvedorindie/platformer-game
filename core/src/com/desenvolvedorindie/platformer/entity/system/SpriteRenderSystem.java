@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.desenvolvedorindie.platformer.entity.component.SpriteComponent;
+import com.desenvolvedorindie.platformer.entity.component.SpriterAnimationComponent;
 import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
 
 public class SpriteRenderSystem extends IteratingSystem {
@@ -52,6 +53,12 @@ public class SpriteRenderSystem extends IteratingSystem {
 
         batch.setShader(cSprite.shader);
 
+        render(sprite);
+
+        batch.setShader(null);
+    }
+
+    public void render(Sprite sprite) {
         batch.draw(
                 sprite.getTexture(),
                 sprite.getX() - sprite.getOriginX(),
@@ -67,17 +74,13 @@ public class SpriteRenderSystem extends IteratingSystem {
                 sprite.getRegionY(),
                 sprite.getRegionWidth(),
                 sprite.getRegionHeight(),
-                cSprite.flipX,
-                cSprite.flipY
+                sprite.isFlipX(),
+                sprite.isFlipY()
         );
-
-        batch.setShader(null);
     }
 
     @Override
     protected void end() {
         batch.end();
     }
-
-
 }

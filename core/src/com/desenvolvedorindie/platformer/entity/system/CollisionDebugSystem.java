@@ -40,6 +40,18 @@ public class CollisionDebugSystem extends IteratingSystem {
     protected void begin() {
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(Line);
+
+        shapeRenderer.setColor(Color.YELLOW);
+
+        for (int x = 0; x < gameWorld.getWidth(); x++) {
+            for (int y = 0; y < gameWorld.getHeight(); y++) {
+                Rectangle rectangle = gameWorld.getTileRectangle(x, y);
+
+                if (rectangle != null) {
+                    shapeRenderer.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+                }
+            }
+        }
     }
 
     @Override
@@ -80,18 +92,6 @@ public class CollisionDebugSystem extends IteratingSystem {
 
     @Override
     protected void end() {
-        shapeRenderer.setColor(Color.YELLOW);
-
-        for (int x = 0; x < gameWorld.getWidth(); x++) {
-            for (int y = 0; y < gameWorld.getHeight(); y++) {
-                Rectangle rectangle = gameWorld.getTileRectangle(x, y);
-
-                if (rectangle != null) {
-                    shapeRenderer.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-                }
-            }
-        }
-
         shapeRenderer.end();
     }
 

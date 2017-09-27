@@ -7,11 +7,13 @@ import com.artemis.managers.GroupManager;
 import com.artemis.managers.PlayerManager;
 import com.artemis.managers.TagManager;
 import com.artemis.managers.WorldSerializationManager;
+import com.artemis.prefab.JsonValuePrefabReader;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -19,7 +21,6 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.desenvolvedorindie.platformer.PlatformerGame;
@@ -51,7 +52,9 @@ public class World implements IWorld {
 
     public static final String NAME_BG = "background";
     public static final String NAME_FG = "foreground";
-    private final PathFindingDebugSystem pathFindingDebugSystem;
+
+    public int[][] pathMap = new int[CHUNK_WIDTH][CHUNK_HEIGHT];
+    // Pathfinding
     public FlatTiledGraph worldMap;
     public TiledSmoothableGraphPath<FlatTiledNode> path;
     public TiledManhattanDistance<FlatTiledNode> heuristic;
@@ -64,19 +67,27 @@ public class World implements IWorld {
     public int startTileX;
     public int startTileY;
     public boolean smooth = false;
-    public int[][] mapPath = new int[CHUNK_WIDTH][CHUNK_HEIGHT];
-    private EntityTrackerMainWindow entityTrackerWindow;
-    private int[][][] map = new int[CHUNK_WIDTH][CHUNK_HEIGHT][2];
-    private Rectangle[] collisionBoxes = new Rectangle[CHUNK_WIDTH * CHUNK_HEIGHT];
-    private Grid water = new Grid(CHUNK_WIDTH, CHUNK_HEIGHT);
-    private com.artemis.World artemis;
-    private int seaLevel = 318;
-    private float gravity = -576;
-    private int player;
-    private EntitiesFactory entitiesFactory;
+    //Systems
+    private PathFindingDebugSystem pathFindingDebugSystem;
+    private WaterSystem waterSystem;
+    private SpriterAnimationRenderSystem spriterAnimationRenderSystem;
+    private WorldSerializationManager worldSerializationManager;
     private CameraSystem cameraSystem;
     private CollisionDebugSystem collisionDebugSystem;
     private EntityDebugSystem entityDebugSystem;
+    private EntityTrackerMainWindow entityTrackerWindow;
+    //Map
+    private int[][][] map = new int[CHUNK_WIDTH][CHUNK_HEIGHT][2];
+    private int heightMap[] = new int[CHUNK_WIDTH];
+    private Rectangle[][] collisionBoxes = new Rectangle[CHUNK_WIDTH][CHUNK_HEIGHT];
+    private Grid water = new Grid(CHUNK_WIDTH, CHUNK_HEIGHT);
+    private int seaLevel = 318;
+    private float gravity = -576;
+    //Entities
+    private com.artemis.World artemis;
+    private EntitiesFactory entitiesFactory;
+    private int player;
+    private JsonValuePrefabReader jsonValuePrefabReader = new JsonValuePrefabReader(new InternalFileHandleResolver());
 
     public World(OrthographicCamera camera, SpriteBatch batch, ShapeRenderer shapeRenderer) {
         WorldConfigurationBuilder worldConfigBuilder = new WorldConfigurationBuilder()
@@ -97,7 +108,7 @@ public class World implements IWorld {
                         new SpriteRenderSystem(camera, batch),
                         new SpriterAnimationRenderSystem(camera, batch),
                         new WaterSystem(this, camera, shapeRenderer),
-                        cameraSystem = new CameraSystem(this, camera, shapeRenderer)
+                        new CameraSystem(this, camera, shapeRenderer)
                 );
 
         //worldConfigBuilder.with(new EEELPlugin());
@@ -105,9 +116,9 @@ public class World implements IWorld {
         if (PlatformerGame.DEBUG) {
             worldConfigBuilder.with(
                     Priority.LOW,
-                    collisionDebugSystem = new CollisionDebugSystem(this, camera, shapeRenderer),
-                    pathFindingDebugSystem = new PathFindingDebugSystem(this, camera, shapeRenderer),
-                    entityDebugSystem = new EntityDebugSystem(camera, 0)
+                    new CollisionDebugSystem(this, camera, shapeRenderer),
+                    new PathFindingDebugSystem(this, camera, shapeRenderer),
+                    new EntityDebugSystem(camera, 0)
             );
 
             if (Gdx.app.getType().equals(Application.ApplicationType.Desktop)) {
@@ -121,17 +132,19 @@ public class World implements IWorld {
 
         artemis = new com.artemis.World(config);
 
+        artemis.inject(this);
+
         JsonArtemisSerializer backend = new JsonArtemisSerializer(artemis);
         backend.prettyPrint(true);
-        artemis.getSystem(WorldSerializationManager.class).setSerializer(backend);
+        worldSerializationManager.setSerializer(backend);
 
         entitiesFactory = new EntitiesFactory(artemis);
         artemis.inject(entitiesFactory);
 
-        player = entitiesFactory.createPlayer(200, mapToWorld(getHeight() - 3));
+        player = entitiesFactory.createPlayer(mapToWorld(1), mapToWorld(getHeight() - 3));
 
         if (collisionDebugSystem != null) {
-            collisionDebugSystem.setEnabled(true);
+            collisionDebugSystem.setEnabled(false);
         }
 
         if (entityDebugSystem != null) {
@@ -186,16 +199,10 @@ public class World implements IWorld {
         init();
     }
 
-    private boolean isRealFloor(int x, int y) {
-        return !isSolid(x, y) && isSolid(x, y - 1);
-    }
-
     private void init() {
         for (int x = 0; x < getWidth(); x++) {
-            int idx = x * getHeight();
-
             for (int y = 0; y < getHeight(); y++) {
-                collisionBoxes[idx + y] = getBlock(x, y, FG).getTileRectangle(this, x, y);
+                collisionBoxes[x][y] = getBlock(x, y, FG).getTileRectangle(this, x, y);
             }
         }
 
@@ -205,18 +212,19 @@ public class World implements IWorld {
 
         for (int x = 0; x < getWidth(); x++) {
             for (int y = 0; y < getHeight(); y++) {
-                if (isRealFloor(x, y)) {
-                    mapPath[x][y] = TiledNode.TILE_FLOOR;
+                if (isFloor(x, y)) {
+                    pathMap[x][y] = TiledNode.TILE_FLOOR;
                 } else if (!isSolid(x, y)) {
                     boolean isReachable = false;
                     for (int j = y; j >= y - jumpSize; j--) {
-                        if (isRealFloor(x, j)) {
+                        if (isFloor(x, j)) {
                             isReachable = true;
                             break;
                         }
                     }
-                    if (isReachable)
-                        mapPath[x][y] = TiledNode.TILE_FLOOR;
+                    if (isReachable) {
+                        pathMap[x][y] = TiledNode.TILE_FLOOR;
+                    }
                 }
             }
         }
@@ -229,8 +237,8 @@ public class World implements IWorld {
                 if ((!isSolid(x + 1, y)) || !isSolid(x - 1, y)) {
                     yy = y;
                     while (yy >= 0) {
-                        if (mapPath[x][yy] == TiledNode.TILE_EMPTY && !isSolid(x, yy)) {
-                            mapPath[x][yy] = TiledNode.TILE_FLOOR;
+                        if (pathMap[x][yy] == TiledNode.TILE_EMPTY && !isSolid(x, yy)) {
+                            pathMap[x][yy] = TiledNode.TILE_FLOOR;
                         } else {
                             break;
                         }
@@ -243,11 +251,11 @@ public class World implements IWorld {
 
         for (int x = 0; x < getWidth(); x++) {
             for (int y = 0; y < getHeight(); y++) {
-                if (mapPath[x][y] == TiledNode.TILE_FLOOR) {
+                if (pathMap[x][y] == TiledNode.TILE_FLOOR) {
                     for (int xx = x - 1; xx <= x + 1; xx++) {
                         for (yy = y - 1; yy <= y + 1; yy++) {
                             if (isSolid(xx, yy) && isValid(xx, yy))
-                                if (mapPath[xx][yy] == TiledNode.TILE_EMPTY) mapPath[xx][yy] = TiledNode.TILE_WALL;
+                                if (pathMap[xx][yy] == TiledNode.TILE_EMPTY) pathMap[xx][yy] = TiledNode.TILE_WALL;
                         }
                     }
                 }
@@ -256,7 +264,7 @@ public class World implements IWorld {
 
         for (int x = 0; x < getWidth(); x++) {
             for (int y = 0; y < getHeight(); y++) {
-                mapPath[x][y] = isSolid(x, y) ? TiledNode.TILE_WALL : TiledNode.TILE_FLOOR;
+                pathMap[x][y] = isSolid(x, y) ? TiledNode.TILE_WALL : TiledNode.TILE_FLOOR;
             }
         }
 
@@ -267,6 +275,11 @@ public class World implements IWorld {
         heuristic = new TiledManhattanDistance<FlatTiledNode>();
         pathFinder = new IndexedAStarPathFinder<FlatTiledNode>(worldMap, true);
         pathSmoother = new PathSmoother<FlatTiledNode, Vector2>(new TiledRaycastCollisionDetector<FlatTiledNode>(worldMap));
+
+        // init heightmap
+        for (int x = 0; x < getWidth(); x++) {
+            heightMap[x] = calculateHeightMap(x);
+        }
     }
 
     public void updateWaterCells() {
@@ -370,6 +383,10 @@ public class World implements IWorld {
         return Blocks.getBlockById(map[worldToMap(x)][worldToMap(y)][layer]);
     }
 
+    public void setBlock(int x, int y, int layer, Block block) {
+        map[x][y][layer] = Blocks.getIdByBlock(block);
+    }
+
     public int getWidth() {
         return map.length;
     }
@@ -380,7 +397,7 @@ public class World implements IWorld {
 
     @Override
     public int getType(int x, int y) {
-        return mapPath[x][y];
+        return pathMap[x][y];
     }
 
     public int getLayers() {
@@ -396,11 +413,47 @@ public class World implements IWorld {
     }
 
     public boolean isSolid(int x, int y) {
-        return !isValid(x, y) || Blocks.getBlockById(map[x][y][1]).isSolid();
+        return isValid(x, y) && Blocks.getBlockById(map[x][y][1]).isSolid();
     }
 
     public boolean isValid(int x, int y) {
         return x >= 0 && x < getWidth() && y >= 0 && y < getHeight();
+    }
+
+    public int calculateHeightMap(int x) {
+        int i;
+
+        for (i = getHeight(); i > -1; i--) {
+            if (isSolid(x, i)) {
+                return i;
+            }
+        }
+
+        return i;
+    }
+
+    public int getHeightMap(int x) {
+        return heightMap[x];
+    }
+
+    public boolean isFloor(int x, int y) {
+        return !isSolid(x, y) && isValid(x, y - 1) && isSolid(x, y - 1);
+    }
+
+    public boolean isFloor(int x, int y, int width, int height) {
+        for (int i = x; i < x + width; i++) {
+            for (int j = y; j < y + height; j++) {
+                if (j == y) {
+                    if (!isFloor(i, j)) {
+                        return false;
+                    }
+                } else if (isSolid(i, j)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     public void dispose() {
@@ -426,7 +479,9 @@ public class World implements IWorld {
     }
 
     public Rectangle getTileRectangle(int x, int y) {
-        return collisionBoxes[x * getHeight() + y];
+        if (isValid(x, y))
+            return collisionBoxes[x][y];
+        return null;
     }
 
     public boolean tileCollisionAtPoint(float x, float y) {

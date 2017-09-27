@@ -211,7 +211,6 @@ project(":core") {
         compile "net.dermetfan.libgdx-utils:libgdx-utils-box2d:$gdxUtilsVersion"
         compile "net.spookygames.gdx:gdx-spriter:$gdxSpriterVersion"
         compile "net.spookygames.gdx:gdx-gfx:$gdxGfxVersion"
-        compile 'com.github.DragonBones.DragonBonesJAVA:dragonbones-libgdx:-SNAPSHOT'
         compile "com.github.desenvolvedorindie.gdx-cameras:core:$gdxCamerasVersion"
         compile "org.luaj:luaj-jse:$luaJVersion"
         testCompile "junit:junit:$jUnitVersion"

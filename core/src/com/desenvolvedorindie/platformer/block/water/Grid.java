@@ -4,9 +4,9 @@ import static com.desenvolvedorindie.platformer.block.water.Cell.CellType;
 
 public class Grid {
 
-    private int width = 80;
+    private int width;
 
-    private int height = 60;
+    private int height;
 
     private Cell[][] cells;
 

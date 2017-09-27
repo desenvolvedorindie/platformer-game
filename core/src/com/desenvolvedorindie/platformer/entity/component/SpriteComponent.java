@@ -8,10 +8,6 @@ public class SpriteComponent extends Component {
 
     public Sprite sprite;
 
-    public boolean flipX;
-
-    public boolean flipY;
-
     public ShaderProgram shader;
 
 }

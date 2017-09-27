@@ -3,6 +3,8 @@ package com.desenvolvedorindie.platformer.entity.system;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -40,9 +42,6 @@ public class MovementSystem extends IteratingSystem {
 
             if (delta == 0) return;
 
-            if (delta > 0.1f)
-                delta = 0.1f;
-
             if (cRigidBody.useGravity) {
                 cRigidBody.velocity.y += world.getGravity() * cRigidBody.gravityMultiplier * delta;
             }
@@ -61,60 +60,91 @@ public class MovementSystem extends IteratingSystem {
                 rectangle.setPosition(cTransform.position);
 
                 float startX, startY, endX, endY;
-                if (velocity.x > 0) {
-                    startX = endX = cTransform.position.x + rectangle.width + velocity.x;
-                } else {
-                    startX = endX = cTransform.position.x + velocity.x;
-                }
-                startY = cTransform.position.y;
-                endY = cTransform.position.y + rectangle.height;
-
-                world.getTilesRectangle(startX, startY, endX, endY, tiles);
-
-                rectangle.x += velocity.x;
-
-                for (Rectangle tile : tiles) {
-                    if (rectangle.overlaps(tile)) {
-                        if (velocity.x > 0) {
-                            cCollidable.onRightWall = true;
-                        } else if (velocity.x < 0) {
-                            cCollidable.onLeftWall = true;
-                        }
-                        velocity.x = 0;
-                        break;
-                    }
-                }
-
-                rectangle.x = cTransform.position.x;
 
                 if (velocity.y > 0) {
-                    startY = endY = cTransform.position.y + rectangle.height + velocity.y;
+                    startY = rectangle.y;
+                    endY = rectangle.y + rectangle.height + velocity.y;
                 } else {
-                    startY = endY = cTransform.position.y + velocity.y;
+                    startY = rectangle.y + velocity.y;
+                    endY = rectangle.y;
                 }
 
-                startX = cTransform.position.x;
-                endX = cTransform.position.x + rectangle.width;
+                startX = rectangle.x;
+                endX = rectangle.x + rectangle.width;
 
                 world.getTilesRectangle(startX, startY, endX, endY, tiles);
 
-                rectangle.y += velocity.y;
+                if (Math.abs(velocity.y) >= 1)
+                    Gdx.app.log("VY", String.valueOf(Math.abs(velocity.y)));
 
-                for (Rectangle tile : tiles) {
-                    if (rectangle.overlaps(tile)) {
-                        if (velocity.y > 0) {
-                            cTransform.position.y = tile.y - rectangle.height;
-                            cCollidable.onCeiling = true;
-                        } else {
-                            cTransform.position.y = tile.y + tile.height;
-                            cCollidable.onGround = true;
+                for (int i = 0; i < Math.abs(velocity.y); i++) {
+                    boolean found = false;
+
+                    float oldY = rectangle.y;
+
+                    rectangle.y += Math.signum(velocity.y);
+
+                    for (Rectangle tile : tiles) {
+                        if (rectangle.overlaps(tile)) {
+                            if (velocity.y > 0) {
+                                cCollidable.onCeiling = true;
+                            } else {
+                                cCollidable.onGround = true;
+                            }
+                            found = true;
+                            break;
                         }
+                    }
+
+                    if (found) {
+                        rectangle.y = oldY;
                         velocity.y = 0;
                         break;
                     }
                 }
 
-                cTransform.position.add(velocity);
+                if (velocity.x > 0) {
+                    startX = rectangle.x;
+                    endX = rectangle.x + rectangle.width + velocity.x;
+                } else {
+                    startX = rectangle.x + velocity.x;
+                    endX = rectangle.x;
+                }
+                startY = rectangle.y;
+                endY = rectangle.y + rectangle.height;
+
+                world.getTilesRectangle(startX, startY, endX, endY, tiles);
+
+                if (Math.abs(velocity.x) >= 1)
+                    Gdx.app.log("VX", String.valueOf(Math.abs(velocity.x)));
+
+                for (int i = 0; i < Math.abs(velocity.x); i++) {
+                    boolean found = false;
+
+                    float oldX = rectangle.x;
+
+                    rectangle.x += Math.signum(velocity.x);
+
+                    for (Rectangle tile : tiles) {
+                        if (rectangle.overlaps(tile)) {
+                            if (velocity.x > 0) {
+                                cCollidable.onRightWall = true;
+                            } else if (velocity.x < 0) {
+                                cCollidable.onLeftWall = true;
+                            }
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        rectangle.x = oldX;
+                        velocity.x = 0;
+                        break;
+                    }
+                }
+
+                cTransform.position.set(MathUtils.floor(rectangle.x), MathUtils.floor(rectangle.y));
 
                 velocity.scl(1 / delta);
 

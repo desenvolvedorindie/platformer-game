@@ -12,6 +12,7 @@ public class DesktopLauncher {
         config.setResizable(false);
         config.useVsync(false);
         config.setTitle(PlatformerGame.NAME);
+        config.useOpenGL3(true, 3, 2);
         new Lwjgl3Application(new PlatformerGame(), config);
     }
 

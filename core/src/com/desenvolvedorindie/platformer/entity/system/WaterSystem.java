@@ -22,6 +22,8 @@ public class WaterSystem extends BaseSystem {
 
     private ShapeRenderer shapeRenderer;
 
+    private boolean mouseDebug;
+
     public WaterSystem(World world, Camera camera, ShapeRenderer shapeRenderer) {
         this.world = world;
         this.camera = camera;
@@ -38,15 +40,17 @@ public class WaterSystem extends BaseSystem {
     protected void processSystem() {
         world.getWater().update();
 
-        if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-            mousePos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            camera.unproject(mousePos);
+        if (mouseDebug) {
+            if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+                mousePos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                camera.unproject(mousePos);
 
-            int x = (int) (mousePos.x / Block.TILE_SIZE);
-            int y = (int) (mousePos.y / Block.TILE_SIZE);
+                int x = (int) (mousePos.x / Block.TILE_SIZE);
+                int y = (int) (mousePos.y / Block.TILE_SIZE);
 
-            if ((x > 0 && x < world.getWater().getWidth()) && (y > 0 && y < world.getWater().getHeight())) {
-                world.getWater().getCell(x, y).addLiquid(5);
+                if ((x > 0 && x < world.getWater().getWidth()) && (y > 0 && y < world.getWater().getHeight())) {
+                    world.getWater().getCell(x, y).addLiquid(5);
+                }
             }
         }
 
@@ -68,8 +72,11 @@ public class WaterSystem extends BaseSystem {
         shapeRenderer.end();
     }
 
-    @Override
-    protected void dispose() {
+    public boolean isMouseDebug() {
+        return mouseDebug;
+    }
 
+    public void setMouseDebug(boolean mouseDebug) {
+        this.mouseDebug = mouseDebug;
     }
 }
