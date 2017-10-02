@@ -62,8 +62,8 @@ public class MovementSystem extends IteratingSystem {
                 float startX, startY, endX, endY;
 
                 if (velocity.y > 0) {
-                    startY = rectangle.y;
-                    endY = rectangle.y + rectangle.height + velocity.y;
+                    startY = rectangle.y + rectangle.height;
+                    endY = startY + velocity.y;
                 } else {
                     startY = rectangle.y + velocity.y;
                     endY = rectangle.y;
@@ -73,9 +73,6 @@ public class MovementSystem extends IteratingSystem {
                 endX = rectangle.x + rectangle.width;
 
                 world.getTilesRectangle(startX, startY, endX, endY, tiles);
-
-                if (Math.abs(velocity.y) >= 1)
-                    Gdx.app.log("VY", String.valueOf(Math.abs(velocity.y)));
 
                 for (int i = 0; i < Math.abs(velocity.y); i++) {
                     boolean found = false;
@@ -104,8 +101,8 @@ public class MovementSystem extends IteratingSystem {
                 }
 
                 if (velocity.x > 0) {
-                    startX = rectangle.x;
-                    endX = rectangle.x + rectangle.width + velocity.x;
+                    startX = rectangle.x + rectangle.width;
+                    endX = startX + velocity.x;
                 } else {
                     startX = rectangle.x + velocity.x;
                     endX = rectangle.x;
@@ -114,9 +111,6 @@ public class MovementSystem extends IteratingSystem {
                 endY = rectangle.y + rectangle.height;
 
                 world.getTilesRectangle(startX, startY, endX, endY, tiles);
-
-                if (Math.abs(velocity.x) >= 1)
-                    Gdx.app.log("VX", String.valueOf(Math.abs(velocity.x)));
 
                 for (int i = 0; i < Math.abs(velocity.x); i++) {
                     boolean found = false;
@@ -144,7 +138,7 @@ public class MovementSystem extends IteratingSystem {
                     }
                 }
 
-                cTransform.position.set(MathUtils.floor(rectangle.x), MathUtils.floor(rectangle.y));
+                cTransform.position.set(rectangle.x, rectangle.y);
 
                 velocity.scl(1 / delta);
 

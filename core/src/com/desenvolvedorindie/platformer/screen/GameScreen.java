@@ -53,9 +53,13 @@ public class GameScreen extends ScreenAdapter {
 
         stage = new Stage(new FitViewport(PlatformerGame.UI_WIDTH, PlatformerGame.UI_HEIGHT, uiCamera), batch);
         stage.setDebugAll(PlatformerGame.DEBUG);
+
         skin = new Skin(Assets.manager.get(Assets.ui));
+        skin.add("font-default", Assets.manager.get(Assets.FONT_HOBO_16));
+        skin.load(Gdx.files.internal("ui/skin.json"));
+
         boolean includeMobile = Gdx.app.getType().equals(Application.ApplicationType.Android) || PlatformerGame.DEBUG;
-        gameHud = new GameHud(skin, includeMobile);
+        gameHud = new GameHud(skin, includeMobile, PlatformerGame.UI_WIDTH, PlatformerGame.UI_HEIGHT);
 
         stage.addActor(gameHud);
 
@@ -112,7 +116,7 @@ public class GameScreen extends ScreenAdapter {
 
         world.update(delta);
 
-        //stage.draw();
+        stage.draw();
 
         /*
         effect.capture();

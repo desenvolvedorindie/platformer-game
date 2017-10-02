@@ -1,21 +1,20 @@
 package com.desenvolvedorindie.platformer.scene2d;
 
-import com.badlogic.gdx.Application;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.ScaleToAction;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.Align;
 import com.desenvolvedorindie.platformer.PlatformerGame;
 import com.desenvolvedorindie.platformer.input.InputSequence;
+import com.desenvolvedorindie.platformer.inventory.Inventory;
 import com.desenvolvedorindie.platformer.scene2d.utils.DirectionalInputListener;
 
-public class GameHud extends Actor {
+public class GameHud extends WidgetGroup {
+
+    public static final int ACTIONBAR_SLOTS = 9;
 
     private final int MAX_BUTTONS = 6;
     boolean buttonJustPressed;
@@ -28,33 +27,33 @@ public class GameHud extends Actor {
 
     private boolean includeMobile;
 
+    private ButtonGroup<SlotActor> invetoryBar = new ButtonGroup<SlotActor>();
+
+    DragAndDrop dragAndDrop = new DragAndDrop();
+
+    private InventoryActor inventoryActor;
+
     private Actor current;
 
     private GameHudListener hudListener;
 
-    public GameHud(Skin skin, boolean includeMobile) {
+    public GameHud(Skin skin, boolean includeMobile, float width, float height) {
         this.skin = skin;
         this.includeMobile = includeMobile;
-    }
 
-    @Override
-    public void act(float delta) {
-        super.act(delta);
+        invetoryBar.setMaxCheckCount(1);
+        invetoryBar.setMaxCheckCount(1);
 
-        buttonJustPressed = false;
-        for (int button = 0; button < MAX_BUTTONS; button++) {
-            buttonsLastState[button] = buttonsState[button];
-            buttonsCurrentState[button] = isButtonPressed(button);
-            buttonJustPressed |= buttonsCurrentState[button];
-        }
-    }
+        inventoryActor = new InventoryActor(new Inventory(), dragAndDrop, skin);
+        addActor(inventoryActor);
+        inventoryActor.setVisible(true);
 
-    @Override
-    protected void setStage(Stage stage) {
-        super.setStage(stage);
+        actionbar = new Image(skin, "actionbar");
+        actionbar.setPosition(width / 2 - actionbar.getWidth() / 2,height - actionbar.getHeight());
+        addActor(actionbar);
 
-        float width = getStage().getViewport().getWorldWidth();
-        float height = getStage().getViewport().getWorldHeight();
+        invetoryBar.uncheckAll();
+        invetoryBar.getButtons().get(0).setChecked(true);
 
         if (includeMobile) {
             float duration = 1f;
@@ -66,7 +65,7 @@ public class GameHud extends Actor {
             upScaleToAction.setInterpolation(Interpolation.linear);
             upScaleToAction.setScale(scale);
 
-            up = new ImageButton(skin.getDrawable("controller_up"));
+            up = new ImageButton(skin, "up");
             up.setPosition(center.x - 22, center.y + 11);
             up.setOrigin(Align.center);
             up.setTransform(true);
@@ -88,14 +87,14 @@ public class GameHud extends Actor {
                     }
                 }
             });
-            stage.addActor(up);
+            addActor(up);
 
             downScaleToAction = new ScaleToAction();
             downScaleToAction.setDuration(duration);
             downScaleToAction.setInterpolation(Interpolation.linear);
             downScaleToAction.setScale(scale);
 
-            down = new ImageButton(skin.getDrawable("controller_down"));
+            down = new ImageButton(skin, "down");
             down.setPosition(center.x - 22, center.y - 54);
             down.setOrigin(Align.center);
             down.setTransform(true);
@@ -117,14 +116,14 @@ public class GameHud extends Actor {
                     }
                 }
             });
-            stage.addActor(down);
+            addActor(down);
 
             leftScaleToAction = new ScaleToAction();
             leftScaleToAction.setDuration(duration);
             leftScaleToAction.setInterpolation(Interpolation.linear);
             leftScaleToAction.setScale(scale);
 
-            left = new ImageButton(skin.getDrawable("controller_left"));
+            left = new ImageButton(skin, "left");
             left.setPosition(center.x - 55, center.y - 21);
             left.setOrigin(Align.center);
             left.setTransform(true);
@@ -146,14 +145,14 @@ public class GameHud extends Actor {
                     }
                 }
             });
-            stage.addActor(left);
+            addActor(left);
 
             rightScaleToAction = new ScaleToAction();
             rightScaleToAction.setDuration(duration);
             rightScaleToAction.setInterpolation(Interpolation.linear);
             rightScaleToAction.setScale(scale);
 
-            right = new ImageButton(skin.getDrawable("controller_right"));
+            right = new ImageButton(skin, "right");
             right.setPosition(center.x + 11, center.y - 22);
             right.setOrigin(Align.center);
             right.setTransform(true);
@@ -175,14 +174,14 @@ public class GameHud extends Actor {
                     }
                 }
             });
-            stage.addActor(right);
+            addActor(right);
 
             bScaleToAction = new ScaleToAction();
             bScaleToAction.setDuration(duration);
             bScaleToAction.setInterpolation(Interpolation.linear);
             bScaleToAction.setScale(scale);
 
-            b = new ImageButton(skin.getDrawable("controller_b"));
+            b = new ImageButton(skin, "b");
             b.setPosition(PlatformerGame.UI_WIDTH - 4 - b.getWidth(), 4);
             b.setOrigin(Align.center);
             b.setTransform(true);
@@ -204,12 +203,20 @@ public class GameHud extends Actor {
                     }
                 }
             });
-            stage.addActor(b);
+            addActor(b);
         }
+    }
 
-        actionbar = new Image(skin, "actionbar");
-        actionbar.setPosition(width / 2 - actionbar.getWidth() / 2,height - actionbar.getHeight());
-        stage.addActor(actionbar);
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+
+        buttonJustPressed = false;
+        for (int button = 0; button < MAX_BUTTONS; button++) {
+            buttonsLastState[button] = buttonsState[button];
+            buttonsCurrentState[button] = isButtonPressed(button);
+            buttonJustPressed |= buttonsCurrentState[button];
+        }
     }
 
     private void sort() {

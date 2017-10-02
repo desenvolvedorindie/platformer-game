@@ -3,7 +3,7 @@ package com.desenvolvedorindie.platformer.math;
 import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 
-public class Triangle implements Shape2D {
+public class RightTriangle implements Shape2D {
 
 
 

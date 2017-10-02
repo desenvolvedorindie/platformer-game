@@ -6,7 +6,7 @@ import com.desenvolvedorindie.platformer.inventory.Inventory;
 
 public class PlayerComponent extends Component {
 
-    public IInventory inventory = new Inventory(null, 9);
+    public Inventory inventory = new Inventory();
 
     public boolean alreadyFalling;
 

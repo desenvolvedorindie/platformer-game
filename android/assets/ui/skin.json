@@ -1,0 +1,35 @@
+{
+  "com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle": {
+    "up": {
+      "imageUp": "controller_up"
+    },
+    "down": {
+      "imageUp": "controller_down"
+    },
+    "left": {
+      "imageUp": "controller_left"
+    },
+    "right": {
+      "imageUp": "controller_right"
+    },
+    "b": {
+      "imageUp": "controller_b"
+    }
+  },
+  "com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle": {
+    "default": {
+      "titleFont": "font-default",
+      "titleFontColor": {"r": 0, "g": 1, "b": 0, "a": 1}
+    }
+  },
+  "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
+    "default": {
+      "font": "font-default",
+    }
+  },
+  "com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle" : {
+    "default": {
+
+    }
+  }
+}

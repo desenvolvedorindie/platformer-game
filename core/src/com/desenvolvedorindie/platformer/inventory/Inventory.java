@@ -8,116 +8,60 @@ import com.desenvolvedorindie.platformer.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Inventory implements IInventory {
+public class Inventory {
 
-    protected final Array<ItemStack> inventory;
+    protected Array<Slot> slots;
 
-    protected List<IInventoryChangedListener> changeListeners;
-
-    private String title;
-
-    public Inventory(String title, int slotsCount) {
-        this.title = title;
-
-        inventory = new Array<>(slotsCount);
-
-        for (int i = 0; i < slotsCount; i++) {
-            inventory.add(new ItemStack(null, 0));
+    public Inventory() {
+        slots = new Array<>(9);
+        for(int i = 0; i < 9; i++) {
+            slots.add(new Slot(null, 0));
         }
     }
 
-    @Override
-    public int getSize() {
-        return inventory.size;
-    }
+    public int checkInventory(Item item) {
+        int amount = 0;
 
-    @Override
-    public boolean removeItemStack(int index, int count) {
-        ItemStack itemStack = inventory.get(index);
-        if (itemStack.stack < count) {
-            return false;
-        }
-        itemStack.stack -= count;
-        return true;
-    }
-
-    @Override
-    public ItemStack removeItemStack(int index) {
-        ItemStack itemStack = inventory.get(index);
-        itemStack.setItem(null);
-        return itemStack;
-    }
-
-    @Override
-    public ItemStack getItemStack(int index) {
-        return null;
-    }
-
-    @Override
-    public void setItemStack(int index, ItemStack itemStack) {
-        inventory.set(index, itemStack);
-    }
-
-    @Override
-    public boolean isItemValidForSlot(int index, ItemStack itemStack) {
-        return true;
-    }
-
-    @Override
-    public boolean hasItem(Item item) {
-        return false;
-    }
-
-    @Override
-    public boolean getItemCount(Item item) {
-        return false;
-    }
-
-    @Override
-    public boolean hasItemCount(Item item, int count) {
-        return false;
-    }
-
-    @Override
-    public boolean isFull() {
-        for (int i = 0; i < getSize(); i++) {
-            if (inventory.get(i) == null) {
-                return false;
+        for (Slot slot : slots) {
+            if (slot.getItem() == item) {
+                amount += slot.getAmount();
             }
         }
 
-        return true;
+        return amount;
     }
 
-    @Override
-    public void clear() {
-        for (int i = 0; i < getSize(); i++) {
-            inventory.set(i, null);
+    public boolean store(Item item, int amount) {
+        // first check for a slot with the same item type
+        Slot itemSlot = firstSlotWithItem(item);
+        if (itemSlot != null) {
+            itemSlot.add(item, amount);
+            return true;
+        } else {
+            // now check for an available empty slot
+            Slot emptySlot = firstSlotWithItem(null);
+            if (emptySlot != null) {
+                emptySlot.add(item, amount);
+                return true;
+            }
         }
+
+        // no slot to add
+        return false;
     }
 
-    @Override
-    public void addChangeListener(IInventoryChangedListener inventoryChangedListener) {
-        if (changeListeners == null)
-            changeListeners = new ArrayList<IInventoryChangedListener>();
-
-        changeListeners.add(inventoryChangedListener);
+    public Array<Slot> getSlots() {
+        return slots;
     }
 
-    @Override
-    public void removeChangeListener(IInventoryChangedListener inventoryChangedListener) {
-        if (changeListeners != null)
-            changeListeners.remove(inventoryChangedListener);
-    }
+    private Slot firstSlotWithItem(Item item) {
+        for (Slot slot : slots) {
+            if (slot.getItem() == item) {
+                return slot;
+            }
+        }
 
-    @Override
-    public void open(Entity entity) {
-
-    }
-
-    @Override
-    public void close(Entity entity) {
-
+        return null;
     }
 
 }
