@@ -31,14 +31,16 @@ public class SlotSource extends DragAndDrop.Source {
         Drawable icon = payloadSlot.getItem().getIcon();
 
         Actor dragActor = new Image(icon);
+        dragActor.setSize(16, 16);
         payload.setDragActor(dragActor);
 
         Actor validDragActor = new Image(icon);
-        // validDragActor.setColor(0, 1, 0, 1);
+        validDragActor.setSize(16, 16);
+        validDragActor.setColor(0, 1, 0, 1);
         payload.setValidDragActor(validDragActor);
 
         Actor invalidDragActor = new Image(icon);
-        // invalidDragActor.setColor(1, 0, 0, 1);
+        invalidDragActor.setColor(1, 0, 0, 1);
         payload.setInvalidDragActor(invalidDragActor);
 
         return payload;

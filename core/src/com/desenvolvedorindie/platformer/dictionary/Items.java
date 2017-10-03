@@ -34,7 +34,6 @@ public class Items {
     private static Item register(int id, Item item) {
         REGISTRY.put(id, item);
 
-
         return item;
     }
 

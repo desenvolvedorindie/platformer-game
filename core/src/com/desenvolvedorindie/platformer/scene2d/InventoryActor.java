@@ -10,37 +10,25 @@ import com.desenvolvedorindie.platformer.inventory.Slot;
 public class InventoryActor extends Window {
 
     public InventoryActor(Inventory inventory, DragAndDrop dragAndDrop, Skin skin) {
-        super("Inventory", skin);
+        super("", skin);
 
         // add an "X" button to the top right of the window, and make it hide the inventory
         TextButton closeButton = new TextButton("X", skin);
         closeButton.addListener(new HidingClickListener(this));
 
         // basic layout
-        setPosition(400, 100);
-        defaults().space(8);
+        defaults().space(16).width(16).height(16);
         row().fill().expandX();
 
         // run through all slots and create SlotActors for each
-        int i = 0;
         for (Slot slot : inventory.getSlots()) {
             SlotActor slotActor = new SlotActor(skin, slot);
             add(slotActor);
 
-            // this can be ignored for now and will be explained in part III
             dragAndDrop.addSource(new SlotSource(slotActor));
             dragAndDrop.addTarget(new SlotTarget(slotActor));
-
-            i++;
-            // every 5 cells, we are going to jump to a new row
-            if (i % 5 == 0) {
-                row();
-            }
         }
 
         pack();
-
-        // it is hidden by default
-        setVisible(false);
     }
 }

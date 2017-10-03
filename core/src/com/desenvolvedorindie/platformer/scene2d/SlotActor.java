@@ -1,5 +1,6 @@
 package com.desenvolvedorindie.platformer.scene2d;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -40,7 +41,7 @@ public class SlotActor extends ImageButton implements SlotListener {
 
         SlotTooltip tooltip = new SlotTooltip(slot, skin);
         tooltip.setTouchable(Touchable.disabled); // allows for mouse to hit tooltips in the top-right corner of the screen without flashing
-        stage.addActor(tooltip);
+        addActor(tooltip);
         addListener(new TooltipListener(tooltip, true));
     }
 

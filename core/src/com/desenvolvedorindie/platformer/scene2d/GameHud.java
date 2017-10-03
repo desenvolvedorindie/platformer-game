@@ -44,16 +44,18 @@ public class GameHud extends WidgetGroup {
         invetoryBar.setMaxCheckCount(1);
         invetoryBar.setMaxCheckCount(1);
 
-        inventoryActor = new InventoryActor(new Inventory(), dragAndDrop, skin);
-        addActor(inventoryActor);
-        inventoryActor.setVisible(true);
+        dragAndDrop.setDragActorPosition(8, -8);
 
         actionbar = new Image(skin, "actionbar");
         actionbar.setPosition(width / 2 - actionbar.getWidth() / 2,height - actionbar.getHeight());
         addActor(actionbar);
 
-        invetoryBar.uncheckAll();
-        invetoryBar.getButtons().get(0).setChecked(true);
+        inventoryActor = new InventoryActor(new Inventory(), dragAndDrop, skin);
+        inventoryActor.setPosition(width / 2 - inventoryActor.getWidth() / 2 + 1, height - inventoryActor.getHeight() / 2 - 18);
+        addActor(inventoryActor);
+
+        //invetoryBar.uncheckAll();
+        //invetoryBar.getButtons().get(0).setChecked(true);
 
         if (includeMobile) {
             float duration = 1f;

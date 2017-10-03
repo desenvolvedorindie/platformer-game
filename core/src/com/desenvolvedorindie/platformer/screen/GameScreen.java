@@ -52,7 +52,7 @@ public class GameScreen extends ScreenAdapter {
         uiCamera.setToOrtho(false, PlatformerGame.UI_WIDTH, PlatformerGame.UI_HEIGHT);
 
         stage = new Stage(new FitViewport(PlatformerGame.UI_WIDTH, PlatformerGame.UI_HEIGHT, uiCamera), batch);
-        stage.setDebugAll(PlatformerGame.DEBUG);
+        //stage.setDebugAll(PlatformerGame.DEBUG);
 
         skin = new Skin(Assets.manager.get(Assets.ui));
         skin.add("font-default", Assets.manager.get(Assets.FONT_HOBO_16));
@@ -71,7 +71,7 @@ public class GameScreen extends ScreenAdapter {
         cTransform.position.y = World.mapToWorld(world.getHeightMap(World.worldToMap(cTransform.position.x)) + 1);
 
         InputProcessor playerInput = world.getArtemis().getSystem(PlayerControllerSystem.class).getPlayerInputAdapter();
-        Gdx.input.setInputProcessor(new InputMultiplexer(stage, playerInput));
+        Gdx.input.setInputProcessor(new InputMultiplexer(stage/*, playerInput*/));
         gameHud.setHudListener(world.getArtemis().getSystem(PlayerControllerSystem.class).getPlayerInputAdapter());
 
         /*

@@ -1,21 +1,19 @@
 package com.desenvolvedorindie.platformer.inventory;
 
-import com.artemis.Entity;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.desenvolvedorindie.platformer.dictionary.Items;
 import com.desenvolvedorindie.platformer.item.Item;
-import com.desenvolvedorindie.platformer.item.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Inventory {
 
     protected Array<Slot> slots;
 
     public Inventory() {
-        slots = new Array<>(9);
-        for(int i = 0; i < 9; i++) {
-            slots.add(new Slot(null, 0));
+        int quantity = 9;
+        slots = new Array<>(quantity);
+        for (int i = 0; i < quantity; i++) {
+            slots.add(new Slot(Items.SWORD, 1));
         }
     }
 

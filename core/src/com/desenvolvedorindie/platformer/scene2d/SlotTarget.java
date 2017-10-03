@@ -17,14 +17,13 @@ public class SlotTarget extends DragAndDrop.Target {
     @Override
     public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
         Slot payloadSlot = (Slot) payload.getObject();
-        // if (targetSlot.getItem() == payloadSlot.getItem() ||
-        // targetSlot.getItem() == null) {
-        getActor().setColor(Color.WHITE);
-        return true;
-        // } else {
-        // getActor().setColor(Color.DARK_GRAY);
-        // return false;
-        // }
+        if (targetSlot.getItem() == payloadSlot.getItem() || targetSlot.getItem() == null) {
+            getActor().setColor(Color.WHITE);
+            return true;
+        } else {
+            getActor().setColor(Color.DARK_GRAY);
+            return false;
+        }
     }
 
     @Override

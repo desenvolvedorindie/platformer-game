@@ -54,7 +54,7 @@ public class Assets {
         {
             fontFileName = "fonts/hobo.ttf";
             fontParameters = new FreeTypeFontGenerator.FreeTypeFontParameter();
-            fontParameters.size = 16;
+            fontParameters.size = 8;
         }
     });
 
