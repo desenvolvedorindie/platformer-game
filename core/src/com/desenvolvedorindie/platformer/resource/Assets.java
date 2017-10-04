@@ -88,11 +88,13 @@ public class Assets {
     }
 
     public static void debug() {
+        /*
         Gdx.app.log("PASSTHROUGH", manager.get(SHADER_PASSTHROUGH).isCompiled() ? "Compiled" : manager.get(SHADER_PASSTHROUGH).getLog());
         Gdx.app.log("VIGNETTE", manager.get(SHADER_VIGNETTE).isCompiled() ? "Compiled" : manager.get(SHADER_VIGNETTE).getLog());
         Gdx.app.log("INVERT", manager.get(SHADER_INVERT).isCompiled() ? "Compiled" : manager.get(SHADER_INVERT).getLog());
         Gdx.app.log("EMBOSS", manager.get(SHADER_EMBOSS).isCompiled() ? "Compiled" : manager.get(SHADER_EMBOSS).getLog());
         Gdx.app.log("SKY", manager.get(SHADER_SKY).isCompiled() ? "Compiled" : manager.get(SHADER_SKY).getLog());
+        */
     }
 
 }

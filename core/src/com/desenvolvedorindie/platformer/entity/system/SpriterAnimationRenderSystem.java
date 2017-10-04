@@ -5,7 +5,6 @@ import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.desenvolvedorindie.platformer.entity.component.SpriteComponent;
 import com.desenvolvedorindie.platformer.entity.component.SpriterAnimationComponent;
 import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
 import net.spookygames.gdx.spriter.SpriterAnimator;
@@ -51,9 +50,8 @@ public class SpriterAnimationRenderSystem extends IteratingSystem {
 
         spriterAnimation.update(world.getDelta());
 
-        batch.setShader(cSpriterAnimation.shader);
-        render(spriterAnimation);
-        batch.setShader(null);
+        if (cSpriterAnimation.render)
+            render(spriterAnimation);
     }
 
     public void render(SpriterAnimator spriterAnimation) {

@@ -1,11 +1,9 @@
 package com.desenvolvedorindie.platformer.screen;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Matrix4;
@@ -13,11 +11,14 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.desenvolvedorindie.platformer.PlatformerGame;
+import com.desenvolvedorindie.platformer.entity.component.PlayerComponent;
 import com.desenvolvedorindie.platformer.entity.component.SpriterAnimationComponent;
 import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
 import com.desenvolvedorindie.platformer.entity.system.PlayerControllerSystem;
 import com.desenvolvedorindie.platformer.entity.system.SpriterAnimationRenderSystem;
+import com.desenvolvedorindie.platformer.graphics.fx.Greyscale;
 import com.desenvolvedorindie.platformer.graphics.fx.Outline;
 import com.desenvolvedorindie.platformer.resource.Assets;
 import com.desenvolvedorindie.platformer.scene2d.GameHud;
@@ -27,6 +28,7 @@ import net.spookygames.gdx.spriter.SpriterAnimator;
 
 public class GameScreen extends ScreenAdapter {
 
+    private final Color color = new Color();
     MultiTemporalVisualEffect effect;
     Rectangle viewportRectangle = new Rectangle();
     private World world;
@@ -37,6 +39,7 @@ public class GameScreen extends ScreenAdapter {
     private Stage stage;
     private GameHud gameHud;
     private Skin skin;
+    private Outline outline;
 
     @Override
     public void show() {
@@ -51,7 +54,7 @@ public class GameScreen extends ScreenAdapter {
         uiCamera = new OrthographicCamera(PlatformerGame.UI_WIDTH, PlatformerGame.UI_HEIGHT);
         uiCamera.setToOrtho(false, PlatformerGame.UI_WIDTH, PlatformerGame.UI_HEIGHT);
 
-        stage = new Stage(new FitViewport(PlatformerGame.UI_WIDTH, PlatformerGame.UI_HEIGHT, uiCamera), batch);
+        stage = new Stage(new FitViewport(PlatformerGame.UI_WIDTH, PlatformerGame.UI_HEIGHT, uiCamera));
         //stage.setDebugAll(PlatformerGame.DEBUG);
 
         skin = new Skin(Assets.manager.get(Assets.ui));
@@ -71,79 +74,77 @@ public class GameScreen extends ScreenAdapter {
         cTransform.position.y = World.mapToWorld(world.getHeightMap(World.worldToMap(cTransform.position.x)) + 1);
 
         InputProcessor playerInput = world.getArtemis().getSystem(PlayerControllerSystem.class).getPlayerInputAdapter();
-        Gdx.input.setInputProcessor(new InputMultiplexer(stage/*, playerInput*/));
+        Gdx.input.setInputProcessor(new InputMultiplexer(stage, playerInput));
         gameHud.setHudListener(world.getArtemis().getSystem(PlayerControllerSystem.class).getPlayerInputAdapter());
 
-        /*
         effect = new MultiTemporalVisualEffect(Pixmap.Format.RGBA8888, false);
-
-        viewportRectangle.set(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         effect.getCombinedBuffer().setViewport(viewportRectangle);
 
-        effect.addEffect(new Outline(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 1280, 720) {
+        effect.clearEffects();
+
+        effect.addEffect(outline = new Outline(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera.viewportWidth, camera.viewportHeight) {
             {
                 setThickness(2f);
-                setColor(Color.BLUE);
+                setColor(color);
             }
-
             @Override
             public void renderOutlined() {
+                SpriterAnimationRenderSystem sRender = world.getArtemis().getSystem(SpriterAnimationRenderSystem.class);
+
+                SpriterAnimationComponent cSpriterAnimation = world.getArtemis().getEntity(world.getPlayer()).getComponent(SpriterAnimationComponent.class);
+
                 batch.begin();
-                SpriterAnimator spriterAnimator = world.getArtemis().getEntity(world.getPlayer()).getComponent(SpriterAnimationComponent.class).spriterAnimator;
-                world.getArtemis().getSystem(SpriterAnimationRenderSystem.class).render(spriterAnimator);
+                sRender.render(cSpriterAnimation.spriterAnimator);
                 batch.end();
             }
-
-            @Override
-            public String toString() {
-                return "Outline";
-            }
-
         });
-        */
     }
 
     @Override
     public void render(float delta) {
-        //Matrix4 c = camera.combined.cpy();
+        PlayerComponent playerComponent = world.getArtemis().getEntity(world.getPlayer()).getComponent(PlayerComponent.class);
+        color.set(playerComponent.r, playerComponent.g, playerComponent.b, 1);
+        outline.setColor(color);
 
-        //effect.update(delta);
+        effect.update(delta);
         stage.act(delta);
 
-        Gdx.gl.glClearColor(0.7f, 0.7f, 1.0f, 1);
+        /* Draw */
+
+        Gdx.gl.glClearColor(1.0f, 1.0f, 1.0f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+
+        effect.capture();
+
+        Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         world.update(delta);
 
         stage.draw();
 
-        /*
-        effect.capture();
-
-        Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         effect.render(effect.endCapture(), null);
-        */
     }
 
-    /*
+    @Override
+    public void resize(int width, int height) {
+        Viewport viewport = stage.getViewport();
+        viewport.update(width, height, true);
+        viewportRectangle.set(viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
+    }
+
     @Override
     public void resume() {
         effect.rebind();
     }
 
     @Override
-    public void resize(int width, int height) {
-        batch.setProjectionMatrix(camera.combined);
-    }
-    */
-
-    @Override
     public void dispose() {
-        //effect.dispose();
+        effect.dispose();
         batch.dispose();
+        stage.dispose();
         shapeRenderer.dispose();
         world.dispose();
     }

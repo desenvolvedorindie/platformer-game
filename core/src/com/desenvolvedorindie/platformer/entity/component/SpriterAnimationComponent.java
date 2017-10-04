@@ -9,8 +9,8 @@ public class SpriterAnimationComponent extends Component {
 
     public SpriterAnimator spriterAnimator;
 
-    public ShaderProgram shader/* = Assets.manager.get(Assets.SHADER_PASSTHROUGH)*/;
-
     public float speed = 1f;
+
+    public boolean render = false;
 
 }

@@ -16,6 +16,8 @@ public class PlayerComponent extends Component {
 
     public boolean godMode;
 
+    public float r = 1, g = 1, b = 1;
+
     //KEYS
 
 

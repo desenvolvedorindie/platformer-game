@@ -44,8 +44,8 @@ import static com.desenvolvedorindie.platformer.block.water.Cell.CellType;
 
 public class World implements IWorld {
 
-    public static final int CHUNK_WIDTH = 128;
-    public static final int CHUNK_HEIGHT = 512;
+    public static final int CHUNK_WIDTH = 80;
+    public static final int CHUNK_HEIGHT = 45;
 
     public static final int BG = 0;
     public static final int FG = 1;
@@ -81,7 +81,7 @@ public class World implements IWorld {
     private int heightMap[] = new int[CHUNK_WIDTH];
     private Rectangle[][] collisionBoxes = new Rectangle[CHUNK_WIDTH][CHUNK_HEIGHT];
     private Grid water = new Grid(CHUNK_WIDTH, CHUNK_HEIGHT);
-    private int seaLevel = 318;
+    private int seaLevel = 10;
     private float gravity = -576;
     //Entities
     private com.artemis.World artemis;
@@ -187,7 +187,7 @@ public class World implements IWorld {
                         if (l == 0) {
                             block = Blocks.DIRT;
                         } else {
-                            block = random.nextInt(100) > 90 ? Blocks.DIRT : Blocks.AIR;
+                            block = random.nextInt(100) > 95 ? Blocks.DIRT : Blocks.AIR;
                         }
                     }
 
