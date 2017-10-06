@@ -1,9 +1,7 @@
-
 uniform sampler2D u_texture;
 uniform vec2 u_resolution;
 
 //"in" attributes from our vertex shader
-varying vec4 v_color;
 varying vec2 v_texCoord0;
 
 //RADIUS of our vignette, where 0.5 results in b circle fitting the screen
@@ -47,5 +45,5 @@ void main() {
     texColor.rgb = mix(texColor.rgb, sepiaColor, 0.75);
 
     //final colour, multiplied by vertex colour
-    gl_FragColor = texColor * v_color;
+    gl_FragColor = texColor;
 }

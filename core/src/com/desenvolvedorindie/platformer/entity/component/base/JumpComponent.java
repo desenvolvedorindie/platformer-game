@@ -1,4 +1,4 @@
-package com.desenvolvedorindie.platformer.entity.component;
+package com.desenvolvedorindie.platformer.entity.component.base;
 
 import com.artemis.Component;
 

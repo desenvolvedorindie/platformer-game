@@ -63,9 +63,7 @@ public abstract class Outline implements VisualEffect, Disposable {
 		// Draw outlined to buffer
 		buffer.getCurrentTexture().bind(0);
 		buffer.begin();
-		
-		Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
 		renderOutlined();
 		
 		buffer.end();

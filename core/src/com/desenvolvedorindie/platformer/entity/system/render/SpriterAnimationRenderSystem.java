@@ -1,12 +1,15 @@
-package com.desenvolvedorindie.platformer.entity.system;
+package com.desenvolvedorindie.platformer.entity.system.render;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.desenvolvedorindie.platformer.entity.component.SpriterAnimationComponent;
-import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.render.GFXComponent;
+import com.desenvolvedorindie.platformer.entity.component.render.SpriterAnimationComponent;
 import net.spookygames.gdx.spriter.SpriterAnimator;
 
 public class SpriterAnimationRenderSystem extends IteratingSystem {
@@ -14,6 +17,8 @@ public class SpriterAnimationRenderSystem extends IteratingSystem {
     private ComponentMapper<TransformComponent> mTransform;
 
     private ComponentMapper<SpriterAnimationComponent> mSpriterAnimation;
+
+    private ComponentMapper<GFXComponent> mGFX;
 
     private OrthographicCamera camera;
 
@@ -35,6 +40,7 @@ public class SpriterAnimationRenderSystem extends IteratingSystem {
     protected void process(int entityId) {
         TransformComponent cTransform = mTransform.get(entityId);
         SpriterAnimationComponent cSpriterAnimation = mSpriterAnimation.get(entityId);
+        GFXComponent cGFX = mGFX.get(entityId);
 
         SpriterAnimator spriterAnimation = cSpriterAnimation.spriterAnimator;
 
@@ -50,8 +56,17 @@ public class SpriterAnimationRenderSystem extends IteratingSystem {
 
         spriterAnimation.update(world.getDelta());
 
-        if (cSpriterAnimation.render)
+        if (cSpriterAnimation.render) {
             render(spriterAnimation);
+        }
+
+        if (mGFX.has(entityId) && cGFX.effect.hasEffects()) {
+            cGFX.effect.capture();
+
+            render(spriterAnimation);
+
+            cGFX.effect.render(cGFX.effect.endCapture(), null);
+        }
     }
 
     public void render(SpriterAnimator spriterAnimation) {
@@ -62,4 +77,5 @@ public class SpriterAnimationRenderSystem extends IteratingSystem {
     protected void end() {
         batch.end();
     }
+
 }

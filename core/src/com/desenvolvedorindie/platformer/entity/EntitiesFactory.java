@@ -1,11 +1,24 @@
 package com.desenvolvedorindie.platformer.entity;
 
 import com.artemis.*;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.desenvolvedorindie.platformer.entity.component.*;
+import com.desenvolvedorindie.platformer.entity.component.PlayerComponent;
+import com.desenvolvedorindie.platformer.entity.component.StateComponent;
+import com.desenvolvedorindie.platformer.entity.component.base.JumpComponent;
+import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent;
+import com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent;
+import com.desenvolvedorindie.platformer.entity.component.render.GFXComponent;
+import com.desenvolvedorindie.platformer.entity.component.render.SpriteComponent;
+import com.desenvolvedorindie.platformer.entity.component.render.SpriterAnimationComponent;
 import com.desenvolvedorindie.platformer.entity.state.PlayerState;
+import com.desenvolvedorindie.platformer.entity.system.render.SpriterAnimationRenderSystem;
+import com.desenvolvedorindie.platformer.graphics.fx.Outline;
 import com.desenvolvedorindie.platformer.resource.Assets;
 import com.desenvolvedorindie.platformer.resource.spriter.PlayerSpriterAnimationListener;
 import net.spookygames.gdx.spriter.SpriterAnimator;
@@ -32,6 +45,8 @@ public class EntitiesFactory {
 
     private ComponentMapper<TransformComponent> mTransform;
 
+    private ComponentMapper<GFXComponent> mGFX;
+
     public EntitiesFactory(World world) {
         this.world = world;
 
@@ -43,6 +58,7 @@ public class EntitiesFactory {
                 .add(JumpComponent.class)
                 .add(RigidBodyComponent.class)
                 .add(CollidableComponent.class)
+                .add(GFXComponent.class)
                 .build(world);
     }
 
@@ -74,6 +90,9 @@ public class EntitiesFactory {
         CollidableComponent cCollidable = mCollidableComponent.get(entity);
         cCollidable.collisionBox.setPosition(new Vector2(x, y));
         cCollidable.collisionBox.setSize(width, height);
+
+        GFXComponent cGFX = mGFX.get(entity);
+
 
         return entity;
     }

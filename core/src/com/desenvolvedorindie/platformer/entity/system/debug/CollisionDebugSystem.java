@@ -1,4 +1,4 @@
-package com.desenvolvedorindie.platformer.entity.system;
+package com.desenvolvedorindie.platformer.entity.system.debug;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -8,9 +8,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.desenvolvedorindie.platformer.entity.component.CollidableComponent;
-import com.desenvolvedorindie.platformer.entity.component.RigidBodyComponent;
-import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent;
+import com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent;
+import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
 import com.desenvolvedorindie.platformer.world.World;
 
 import static com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line;

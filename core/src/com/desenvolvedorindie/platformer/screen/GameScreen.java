@@ -1,36 +1,28 @@
 package com.desenvolvedorindie.platformer.screen;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.desenvolvedorindie.platformer.PlatformerGame;
-import com.desenvolvedorindie.platformer.entity.component.PlayerComponent;
-import com.desenvolvedorindie.platformer.entity.component.SpriterAnimationComponent;
-import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
-import com.desenvolvedorindie.platformer.entity.system.PlayerControllerSystem;
-import com.desenvolvedorindie.platformer.entity.system.SpriterAnimationRenderSystem;
-import com.desenvolvedorindie.platformer.graphics.fx.Greyscale;
-import com.desenvolvedorindie.platformer.graphics.fx.Outline;
+import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.system.world.PlayerControllerSystem;
+import com.desenvolvedorindie.platformer.graphics.fx.*;
 import com.desenvolvedorindie.platformer.resource.Assets;
 import com.desenvolvedorindie.platformer.scene2d.GameHud;
 import com.desenvolvedorindie.platformer.world.World;
 import net.spookygames.gdx.gfx.MultiTemporalVisualEffect;
-import net.spookygames.gdx.spriter.SpriterAnimator;
 
 public class GameScreen extends ScreenAdapter {
 
-    private final Color color = new Color();
-    MultiTemporalVisualEffect effect;
-    Rectangle viewportRectangle = new Rectangle();
+    int current = 0;
+    private MultiTemporalVisualEffect gameEffect, guiEffect;
     private World world;
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
@@ -39,7 +31,6 @@ public class GameScreen extends ScreenAdapter {
     private Stage stage;
     private GameHud gameHud;
     private Skin skin;
-    private Outline outline;
 
     @Override
     public void show() {
@@ -77,72 +68,72 @@ public class GameScreen extends ScreenAdapter {
         Gdx.input.setInputProcessor(new InputMultiplexer(stage, playerInput));
         gameHud.setHudListener(world.getArtemis().getSystem(PlayerControllerSystem.class).getPlayerInputAdapter());
 
-        effect = new MultiTemporalVisualEffect(Pixmap.Format.RGBA8888, false);
+        gameEffect = new MultiTemporalVisualEffect(Pixmap.Format.RGBA8888, false);
+        guiEffect = new MultiTemporalVisualEffect(Pixmap.Format.RGBA8888, false);
 
-        effect.getCombinedBuffer().setViewport(viewportRectangle);
-
-        effect.clearEffects();
-
-        effect.addEffect(outline = new Outline(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera.viewportWidth, camera.viewportHeight) {
-            {
-                setThickness(2f);
-                setColor(color);
-            }
-            @Override
-            public void renderOutlined() {
-                SpriterAnimationRenderSystem sRender = world.getArtemis().getSystem(SpriterAnimationRenderSystem.class);
-
-                SpriterAnimationComponent cSpriterAnimation = world.getArtemis().getEntity(world.getPlayer()).getComponent(SpriterAnimationComponent.class);
-
-                batch.begin();
-                sRender.render(cSpriterAnimation.spriterAnimator);
-                batch.end();
-            }
-        });
+        //Draw
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     @Override
     public void render(float delta) {
-        PlayerComponent playerComponent = world.getArtemis().getEntity(world.getPlayer()).getComponent(PlayerComponent.class);
-        color.set(playerComponent.r, playerComponent.g, playerComponent.b, 1);
-        outline.setColor(color);
-
-        effect.update(delta);
+        gameEffect.update(delta);
+        guiEffect.update(delta);
         stage.act(delta);
 
         /* Draw */
 
-        Gdx.gl.glClearColor(1.0f, 1.0f, 1.0f, 1);
+        gameEffect.capture();
+        Gdx.gl.glClearColor(0.7f, 0.7f, 1.0f, 1.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-
-        effect.capture();
-
-        Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         world.update(delta);
+        gameEffect.render(gameEffect.endCapture(), null);
 
+        guiEffect.capture();
+        Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.draw();
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        guiEffect.render(guiEffect.endCapture(), null);
 
-        effect.render(effect.endCapture(), null);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
+            next();
+        }
     }
 
-    @Override
-    public void resize(int width, int height) {
-        Viewport viewport = stage.getViewport();
-        viewport.update(width, height, true);
-        viewportRectangle.set(viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
+    private void next() {
+        gameEffect.clearEffects();
+
+        switch (current) {
+            case 0:
+                gameEffect.addEffect(new Greyscale());
+                break;
+            case 1:
+                gameEffect.addEffect(new Invert());
+                break;
+            case 2:
+                gameEffect.addEffect(new Vignette());
+                break;
+            case 3:
+                gameEffect.addEffect(new Emboss());
+                break;
+            case 4:
+                gameEffect.addEffect(new Sepia());
+                break;
+            default:
+        }
+
+        current = ++current % 6;
     }
 
     @Override
     public void resume() {
-        effect.rebind();
+        gameEffect.rebind();
     }
 
     @Override
     public void dispose() {
-        effect.dispose();
+        gameEffect.dispose();
         batch.dispose();
         stage.dispose();
         shapeRenderer.dispose();

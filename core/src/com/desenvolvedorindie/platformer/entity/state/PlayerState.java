@@ -4,6 +4,10 @@ import com.artemis.Entity;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.desenvolvedorindie.platformer.entity.component.*;
+import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent;
+import com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent;
+import com.desenvolvedorindie.platformer.entity.component.render.SpriterAnimationComponent;
 
 public enum PlayerState implements State<Entity> {
     Idle {
@@ -11,9 +15,9 @@ public enum PlayerState implements State<Entity> {
         public void update(Entity entity) {
             super.update(entity);
 
-            CollidableComponent cCollidable = entity.getComponent(CollidableComponent.class);
+            com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent cCollidable = entity.getComponent(com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent.class);
             StateComponent cState = entity.getComponent(StateComponent.class);
-            RigidBodyComponent cRigidBody = entity.getComponent(RigidBodyComponent.class);
+            com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent cRigidBody = entity.getComponent(com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent.class);
 
             if (cCollidable.onGround) {
                 if (cRigidBody.velocity.x != 0) {
@@ -28,7 +32,7 @@ public enum PlayerState implements State<Entity> {
         public void enter(Entity entity) {
             super.enter(entity);
 
-            SpriterAnimationComponent cSpriterAnimation = entity.getComponent(SpriterAnimationComponent.class);
+            com.desenvolvedorindie.platformer.entity.component.render.SpriterAnimationComponent cSpriterAnimation = entity.getComponent(com.desenvolvedorindie.platformer.entity.component.render.SpriterAnimationComponent.class);
 
             if (cSpriterAnimation != null)
                 cSpriterAnimation.spriterAnimator.play("idle");
@@ -39,9 +43,9 @@ public enum PlayerState implements State<Entity> {
         public void update(Entity entity) {
             super.update(entity);
 
-            CollidableComponent cCollidable = entity.getComponent(CollidableComponent.class);
+            com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent cCollidable = entity.getComponent(com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent.class);
             StateComponent cState = entity.getComponent(StateComponent.class);
-            RigidBodyComponent cRigidBody = entity.getComponent(RigidBodyComponent.class);
+            com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent cRigidBody = entity.getComponent(com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent.class);
 
             if (cCollidable.onGround) {
                 if (cRigidBody.velocity.x == 0) {
@@ -56,7 +60,7 @@ public enum PlayerState implements State<Entity> {
         public void enter(Entity entity) {
             super.enter(entity);
 
-            SpriterAnimationComponent cSpriterAnimation = entity.getComponent(SpriterAnimationComponent.class);
+            com.desenvolvedorindie.platformer.entity.component.render.SpriterAnimationComponent cSpriterAnimation = entity.getComponent(com.desenvolvedorindie.platformer.entity.component.render.SpriterAnimationComponent.class);
 
             if (cSpriterAnimation != null)
                 cSpriterAnimation.spriterAnimator.play("walk");
@@ -67,9 +71,9 @@ public enum PlayerState implements State<Entity> {
         public void update(Entity entity) {
             super.update(entity);
 
-            RigidBodyComponent cRigidBody = entity.getComponent(RigidBodyComponent.class);
-            SpriterAnimationComponent cSpriterAnimation = entity.getComponent(SpriterAnimationComponent.class);
-            CollidableComponent cCollidable = entity.getComponent(CollidableComponent.class);
+            com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent cRigidBody = entity.getComponent(com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent.class);
+            com.desenvolvedorindie.platformer.entity.component.render.SpriterAnimationComponent cSpriterAnimation = entity.getComponent(com.desenvolvedorindie.platformer.entity.component.render.SpriterAnimationComponent.class);
+            com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent cCollidable = entity.getComponent(CollidableComponent.class);
             StateComponent cState = entity.getComponent(StateComponent.class);
             PlayerComponent cPlayer = entity.getComponent(PlayerComponent.class);
 
@@ -103,8 +107,8 @@ public enum PlayerState implements State<Entity> {
         public void enter(Entity entity) {
             super.enter(entity);
 
-            RigidBodyComponent cRigidBody = entity.getComponent(RigidBodyComponent.class);
-            SpriterAnimationComponent cSpriterAnimation = entity.getComponent(SpriterAnimationComponent.class);
+            com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent cRigidBody = entity.getComponent(com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent.class);
+            com.desenvolvedorindie.platformer.entity.component.render.SpriterAnimationComponent cSpriterAnimation = entity.getComponent(SpriterAnimationComponent.class);
 
             if (cRigidBody.velocity.y > 0) {
                 if (cSpriterAnimation != null)
@@ -128,8 +132,8 @@ public enum PlayerState implements State<Entity> {
 
     @Override
     public void update(Entity entity) {
-        RigidBodyComponent cRigidBodyComponent = entity.getComponent(RigidBodyComponent.class);
-        TransformComponent cTransform = entity.getComponent(TransformComponent.class);
+        com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent cRigidBodyComponent = entity.getComponent(RigidBodyComponent.class);
+        com.desenvolvedorindie.platformer.entity.component.base.TransformComponent cTransform = entity.getComponent(TransformComponent.class);
 
         if (cRigidBodyComponent.velocity.x > 0) {
             cTransform.scaleX = Math.abs(cTransform.scaleX);

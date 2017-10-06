@@ -1,4 +1,4 @@
-package com.desenvolvedorindie.platformer.entity.system;
+package com.desenvolvedorindie.platformer.entity.system.world;
 
 import com.artemis.BaseSystem;
 import com.badlogic.gdx.Gdx;

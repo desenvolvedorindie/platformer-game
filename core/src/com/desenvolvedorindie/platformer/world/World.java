@@ -32,6 +32,11 @@ import com.desenvolvedorindie.platformer.block.water.Grid;
 import com.desenvolvedorindie.platformer.dictionary.Blocks;
 import com.desenvolvedorindie.platformer.entity.EntitiesFactory;
 import com.desenvolvedorindie.platformer.entity.system.*;
+import com.desenvolvedorindie.platformer.entity.system.debug.PathFindingDebugSystem;
+import com.desenvolvedorindie.platformer.entity.system.physic.MovementSystem;
+import com.desenvolvedorindie.platformer.entity.system.render.TileRenderSystem;
+import com.desenvolvedorindie.platformer.entity.system.world.CameraSystem;
+import com.desenvolvedorindie.platformer.entity.system.world.WaterSystem;
 import net.mostlyoriginal.api.event.common.EventSystem;
 import net.namekdev.entity_tracker.EntityTracker;
 import net.namekdev.entity_tracker.ui.EntityTrackerMainWindow;
@@ -68,13 +73,13 @@ public class World implements IWorld {
     public int startTileY;
     public boolean smooth = false;
     //Systems
-    private PathFindingDebugSystem pathFindingDebugSystem;
-    private WaterSystem waterSystem;
-    private SpriterAnimationRenderSystem spriterAnimationRenderSystem;
+    private com.desenvolvedorindie.platformer.entity.system.debug.PathFindingDebugSystem pathFindingDebugSystem;
+    private com.desenvolvedorindie.platformer.entity.system.world.WaterSystem waterSystem;
+    private com.desenvolvedorindie.platformer.entity.system.render.SpriterAnimationRenderSystem spriterAnimationRenderSystem;
     private WorldSerializationManager worldSerializationManager;
-    private CameraSystem cameraSystem;
-    private CollisionDebugSystem collisionDebugSystem;
-    private EntityDebugSystem entityDebugSystem;
+    private com.desenvolvedorindie.platformer.entity.system.world.CameraSystem cameraSystem;
+    private com.desenvolvedorindie.platformer.entity.system.debug.CollisionDebugSystem collisionDebugSystem;
+    private com.desenvolvedorindie.platformer.entity.system.debug.EntityDebugSystem entityDebugSystem;
     private EntityTrackerMainWindow entityTrackerWindow;
     //Map
     private int[][][] map = new int[CHUNK_WIDTH][CHUNK_HEIGHT][2];
@@ -96,17 +101,17 @@ public class World implements IWorld {
                         new PlayerManager(),
                         new TagManager(),
                         new EventSystem(),
-                        new PlayerControllerSystem(),
+                        new com.desenvolvedorindie.platformer.entity.system.world.PlayerControllerSystem(),
                         new MovementSystem(this),
                         new StateSystem(),
                         new OperationSystem(),
-                        new DayNightCycleSystem(),
+                        new com.desenvolvedorindie.platformer.entity.system.world.DayNightCycleSystem(),
                         new WorldSerializationManager()
                 )
                 .with(Priority.LOW,
                         new TileRenderSystem(this, camera, batch),
-                        new SpriteRenderSystem(camera, batch),
-                        new SpriterAnimationRenderSystem(camera, batch),
+                        new com.desenvolvedorindie.platformer.entity.system.render.SpriteRenderSystem(camera, batch),
+                        new com.desenvolvedorindie.platformer.entity.system.render.SpriterAnimationRenderSystem(camera, batch),
                         new WaterSystem(this, camera, shapeRenderer),
                         new CameraSystem(this, camera, shapeRenderer)
                 );
@@ -116,9 +121,9 @@ public class World implements IWorld {
         if (PlatformerGame.DEBUG) {
             worldConfigBuilder.with(
                     Priority.LOW,
-                    new CollisionDebugSystem(this, camera, shapeRenderer),
+                    new com.desenvolvedorindie.platformer.entity.system.debug.CollisionDebugSystem(this, camera, shapeRenderer),
                     new PathFindingDebugSystem(this, camera, shapeRenderer),
-                    new EntityDebugSystem(camera, 0)
+                    new com.desenvolvedorindie.platformer.entity.system.debug.EntityDebugSystem(camera, 0)
             );
 
             if (Gdx.app.getType().equals(Application.ApplicationType.Desktop)) {
@@ -185,7 +190,7 @@ public class World implements IWorld {
                         block = Blocks.DIRT;
                     } else {
                         if (l == 0) {
-                            block = Blocks.DIRT;
+                            block = Blocks.AIR;
                         } else {
                             block = random.nextInt(100) > 95 ? Blocks.DIRT : Blocks.AIR;
                         }

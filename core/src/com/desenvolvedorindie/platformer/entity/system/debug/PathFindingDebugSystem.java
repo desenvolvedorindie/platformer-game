@@ -1,4 +1,4 @@
-package com.desenvolvedorindie.platformer.entity.system;
+package com.desenvolvedorindie.platformer.entity.system.debug;
 
 import com.artemis.BaseSystem;
 import com.badlogic.gdx.Gdx;
@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.desenvolvedorindie.platformer.ai.pathfind.flat.FlatTiledNode;
 import com.desenvolvedorindie.platformer.block.Block;
-import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
 import com.desenvolvedorindie.platformer.world.World;
 
 public class PathFindingDebugSystem extends BaseSystem {

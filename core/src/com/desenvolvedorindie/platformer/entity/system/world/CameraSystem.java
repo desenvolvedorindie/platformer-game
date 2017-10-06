@@ -1,4 +1,4 @@
-package com.desenvolvedorindie.platformer.entity.system;
+package com.desenvolvedorindie.platformer.entity.system.world;
 
 import com.artemis.BaseSystem;
 import com.artemis.ComponentMapper;
@@ -12,11 +12,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.desenvolvedorindie.gdxcamera.constraint.*;
 import com.desenvolvedorindie.platformer.block.Block;
-import com.desenvolvedorindie.platformer.entity.component.CollidableComponent;
-import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent;
+import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
+import com.desenvolvedorindie.platformer.utils.Debuggable;
 import com.desenvolvedorindie.platformer.world.World;
 
-public class CameraSystem extends BaseSystem {
+public class CameraSystem extends BaseSystem implements Debuggable {
 
     private static final float[] ZOOM_LEVELS = new float[]{
             6 / (float) Block.TILE_SIZE,
@@ -83,10 +84,12 @@ public class CameraSystem extends BaseSystem {
         }
     }
 
+    @Override
     public boolean isDebug() {
         return debug;
     }
 
+    @Override
     public void setDebug(boolean debug) {
         this.debug = debug;
     }

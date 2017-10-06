@@ -1,4 +1,4 @@
-package com.desenvolvedorindie.platformer.entity.system;
+package com.desenvolvedorindie.platformer.entity.system.render;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -6,9 +6,8 @@ import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.desenvolvedorindie.platformer.entity.component.SpriteComponent;
-import com.desenvolvedorindie.platformer.entity.component.SpriterAnimationComponent;
-import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.render.SpriteComponent;
+import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
 
 public class SpriteRenderSystem extends IteratingSystem {
 
@@ -51,11 +50,7 @@ public class SpriteRenderSystem extends IteratingSystem {
 
         sprite.setPosition(cTransform.position.x, cTransform.position.y);
 
-        batch.setShader(cSprite.shader);
-
         render(sprite);
-
-        batch.setShader(null);
     }
 
     public void render(Sprite sprite) {
@@ -83,4 +78,5 @@ public class SpriteRenderSystem extends IteratingSystem {
     protected void end() {
         batch.end();
     }
+
 }

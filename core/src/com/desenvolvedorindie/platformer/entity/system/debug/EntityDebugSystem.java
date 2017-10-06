@@ -1,4 +1,4 @@
-package com.desenvolvedorindie.platformer.entity.system;
+package com.desenvolvedorindie.platformer.entity.system.debug;
 
 import com.artemis.BaseSystem;
 import com.artemis.ComponentMapper;
@@ -8,8 +8,8 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.desenvolvedorindie.platformer.entity.component.PlayerComponent;
-import com.desenvolvedorindie.platformer.entity.component.RigidBodyComponent;
-import com.desenvolvedorindie.platformer.entity.component.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent;
+import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
 
 public class EntityDebugSystem extends BaseSystem {
 

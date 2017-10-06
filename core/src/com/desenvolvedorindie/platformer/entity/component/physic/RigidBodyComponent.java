@@ -1,4 +1,4 @@
-package com.desenvolvedorindie.platformer.entity.component;
+package com.desenvolvedorindie.platformer.entity.component.physic;
 
 import com.artemis.Component;
 import com.badlogic.gdx.math.Vector2;

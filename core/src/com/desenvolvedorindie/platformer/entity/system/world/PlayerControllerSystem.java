@@ -1,4 +1,4 @@
-package com.desenvolvedorindie.platformer.entity.system;
+package com.desenvolvedorindie.platformer.entity.system.world;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -10,13 +10,11 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.controllers.PovDirection;
-import com.badlogic.gdx.controllers.mappings.Xbox;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.StringBuilder;
-import com.desenvolvedorindie.platformer.entity.component.CollidableComponent;
-import com.desenvolvedorindie.platformer.entity.component.JumpComponent;
+import com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent;
+import com.desenvolvedorindie.platformer.entity.component.base.JumpComponent;
 import com.desenvolvedorindie.platformer.entity.component.PlayerComponent;
-import com.desenvolvedorindie.platformer.entity.component.RigidBodyComponent;
+import com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent;
 import com.desenvolvedorindie.platformer.input.InputSequence;
 import com.desenvolvedorindie.platformer.scene2d.GameHud;
 
