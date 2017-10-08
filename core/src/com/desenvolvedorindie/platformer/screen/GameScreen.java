@@ -170,18 +170,15 @@ public class GameScreen extends ScreenAdapter {
         gameEffect.render(gameEffect.endCapture(), null);
 
         // DEBUG LIGHT
-        /*
         batch.begin();
         batch.setShader(null);
         batch.setColor(Color.BLACK);
-        batch.draw(occluders, Gdx.graphics.getWidth() - lightSize, 0);
+        batch.draw(occluders, 0, 0);
         batch.setColor(Color.WHITE);
-        batch.draw(shadowMap1D, Gdx.graphics.getWidth() - lightSize, lightSize + 5);
+        batch.draw(shadowMap1D, 0, lightSize + 5);
         batch.end();
-        */
 
         // GUI
-        /*
         guiEffect.capture();
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -189,7 +186,6 @@ public class GameScreen extends ScreenAdapter {
         stage.draw();
         Gdx.gl.glEnable(GL20.GL_BLEND);
         guiEffect.render(guiEffect.endCapture(), null);
-        */
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
             next();
@@ -225,10 +221,10 @@ public class GameScreen extends ScreenAdapter {
         camera.translate(mx - lightSize / 2f, my - lightSize / 2f);
         camera.update();
 
-        int startX = Math.max(0, World.worldToMap(mx - lightSize));
-        int startY = Math.max(0 , World.worldToMap(my - lightSize));
-        int endX = Math.min(world.getWidth(), World.worldToMap(mx));
-        int endY = Math.min(world.getHeight(), World.worldToMap(my));
+        int startX = Math.max(0, World.worldToMap(mx - lightSize / 2f));
+        int startY = Math.max(0, World.worldToMap(my - lightSize / 2f));
+        int endX = Math.min(world.getWidth(), World.worldToMap(mx + lightSize / 2f));
+        int endY = Math.min(world.getHeight(), World.worldToMap(my + lightSize / 2f));
 
         //set up our batch for the occluder pass
         batch.setProjectionMatrix(camera.combined);
@@ -254,11 +250,11 @@ public class GameScreen extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         //set our shadow map shader
-        ShaderProgram shadownMapShader = Assets.manager.get(Assets.SHADER_SHADOWMAP);
-        batch.setShader(shadownMapShader);
+        ShaderProgram shadowMapShader = Assets.manager.get(Assets.SHADER_SHADOWMAP);
+        batch.setShader(shadowMapShader);
         batch.begin();
-        shadownMapShader.setUniformf("resolution", lightSize, lightSize);
-        shadownMapShader.setUniformf("upScale", upScale);
+        shadowMapShader.setUniformf("resolution", lightSize, lightSize);
+        shadowMapShader.setUniformf("upScale", upScale);
 
         //reset our projection matrix to the FBO size
         camera.setToOrtho(false, shadowMapFBO.getWidth(), shadowMapFBO.getHeight());
