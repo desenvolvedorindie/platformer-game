@@ -17,7 +17,6 @@ public class PreloadScreen extends ScreenAdapter {
         Gdx.app.log("Progress", Assets.manager.getProgress() * 100 + "%");
 
         if (Assets.manager.update()) {
-            Assets.debug();
             PlatformerGame.instance().setScreen(new GameScreen());
         }
     }

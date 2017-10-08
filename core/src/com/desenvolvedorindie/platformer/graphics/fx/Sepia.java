@@ -12,4 +12,5 @@ public class Sepia extends SinglePassShaderEffect {
 
         registerParameter("u_resolution", new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
     }
+
 }

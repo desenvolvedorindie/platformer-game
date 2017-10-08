@@ -1,6 +1,7 @@
 package com.desenvolvedorindie.platformer.graphics.fx;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.desenvolvedorindie.platformer.resource.Assets;
@@ -13,4 +14,5 @@ public class Emboss extends SinglePassShaderEffect {
 
         registerParameter("u_resolution", new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
     }
+
 }

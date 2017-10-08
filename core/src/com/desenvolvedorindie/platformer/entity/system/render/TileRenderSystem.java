@@ -35,11 +35,11 @@ public class TileRenderSystem extends BaseSystem {
     protected void processSystem() {
         tileColor.set(0xCCCCCCff);
         batch.setColor(tileColor);
-        renderBackground(batch);
+        renderBackground(batch, 0, 0, world.getWidth(), world.getHeight());
 
         tileColor.set(Color.WHITE);
         batch.setColor(Color.WHITE);
-        renderForeground(batch);
+        renderForeground(batch, 0, 0, world.getWidth(), world.getHeight());
     }
 
     @Override
@@ -47,22 +47,22 @@ public class TileRenderSystem extends BaseSystem {
         batch.end();
     }
 
-    private void renderBackground(Batch batch) {
+    public void renderBackground(Batch batch, int startX, int startY, int endX, int endY) {
         Block block;
 
-        for (int x = 0; x < world.getWidth(); x++) {
-            for (int y = 0; y < world.getHeight(); y++) {
+        for (int x = startX; x < endX; x++) {
+            for (int y = startY; y < endY; y++) {
                 block = world.getBlock(x, y, World.BG);
                 block.render(world, batch, x, y, World.BG);
             }
         }
     }
 
-    private void renderForeground(Batch batch) {
+    public void renderForeground(Batch batch, int startX, int startY, int endX, int endY) {
         Block block;
 
-        for (int x = 0; x < world.getWidth(); x++) {
-            for (int y = 0; y < world.getHeight(); y++) {
+        for (int x = startX; x < endX; x++) {
+            for (int y = startY; y < endY; y++) {
                 block = world.getBlock(x, y, World.FG);
                 block.render(world, batch, x, y, World.FG);
             }

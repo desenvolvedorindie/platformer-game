@@ -2,6 +2,7 @@ buildscript {
     ext {
         appName = "platformer"
         gradlePluginVersion = "2.3.3"
+        retrolambdaVerision = "3.7.0"
         roboVMGraldPluginVersion = "2.3.0"
         objenesisVersion = "2.5"
         moeGradleVersion = "1.3.6"
@@ -21,9 +22,6 @@ buildscript {
         luaJVersion = "2.0"
         bte2Version = "master-SNAPSHOT"
         jUnitVersion = "4.12"
-        retrolambdaVersion = "3.7.0"
-        gradleAptPluginVersion = "0.12"
-        multilineStringVersion = "0.1.1"
         mockitoVersion = "2.+"
     }
 
@@ -41,9 +39,7 @@ buildscript {
         classpath "org.multi-os-engine:moe-gradle:$moeGradleVersion"
         classpath "net.onedaybeard.artemis:artemis-odb-gradle-plugin:$artemisVersion"
         classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-        classpath "me.tatarka:gradle-retrolambda:$retrolambdaVersion"
-        classpath "net.ltgt.gradle:gradle-apt-plugin:$gradleAptPluginVersion"
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        classpath "me.tatarka:gradle-retrolambda:$retrolambdaVerision"
     }
 }
 
@@ -119,7 +115,6 @@ project(":bte") {
 
 project(":android") {
     apply plugin: "android"
-    apply plugin: 'android-apt'
     apply plugin: 'me.tatarka.retrolambda'
 
     configurations {
@@ -170,7 +165,6 @@ project(":ios") {
 
 project(":core") {
     apply plugin: "java"
-    apply plugin: "net.ltgt.apt"
 
     task packTextures {
         logger.info "Packing Textures..."
@@ -221,8 +215,6 @@ project(":core") {
         compile "com.github.spookygames:gdx-gfx:$gdxGfxVersion"
         compile "com.github.desenvolvedorindie.gdx-cameras:core:$gdxCamerasVersion"
         compile "org.luaj:luaj-jse:$luaJVersion"
-        compile "org.adrianwalker:multiline-string:$multilineStringVersion"
-        apt "org.adrianwalker:multiline-string:$multilineStringVersion"
         testCompile "junit:junit:$jUnitVersion"
         testCompile "org.mockito:mockito-core:$mockitoVersion"
     }

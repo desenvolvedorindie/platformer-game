@@ -1,14 +1,10 @@
-#ifdef GL_ES
-precision mediump float; 
-#endif
-
-varying vec2 v_texCoord0;
+varying vec2 v_texCoords;
 
 uniform vec2 u_resolution;
-uniform sampler2D u_sampler2D;
+uniform sampler2D u_texture;
 
 void main() {
-	vec4 color = texture2D(u_sampler2D, v_texCoord0);
+	vec4 color = texture2D(u_texture, v_texCoords);
 	vec2 relativePosition = gl_FragCoord.xy / u_resolution - .5f;
 	float len = length(relativePosition);
 	float vignette = smoothstep(.5, .4, len); 

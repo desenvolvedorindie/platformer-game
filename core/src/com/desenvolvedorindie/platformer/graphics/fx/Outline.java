@@ -16,7 +16,6 @@ import net.spookygames.gdx.gfx.shader.ColorShaderParameter;
 import net.spookygames.gdx.gfx.shader.FloatShaderParameter;
 import net.spookygames.gdx.gfx.shader.OwnedSinglePassShaderEffect;
 import net.spookygames.gdx.gfx.shader.Vector2ShaderParameter;
-import org.adrianwalker.multilinestring.Multiline;
 
 public abstract class Outline implements VisualEffect, Disposable {
 
@@ -130,7 +129,6 @@ public abstract class Outline implements VisualEffect, Disposable {
    			gl_FragColor = vec4(u_color.r * a, u_color.g * a, u_color.b * a, a);
 		}
 		*/
-		@Multiline
 		static String Outline;
 		// @formatter:on
 	
@@ -192,7 +190,7 @@ public abstract class Outline implements VisualEffect, Disposable {
 			gl_FragColor = src1 * (1.0 - src2) + src2;
 		}
 		*/
-		@Multiline static String Superimpose;
+		static String Superimpose;
 		// @formatter:on
 
 		private Texture inputTexture2 = null;

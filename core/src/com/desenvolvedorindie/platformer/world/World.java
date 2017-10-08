@@ -34,8 +34,12 @@ import com.desenvolvedorindie.platformer.entity.EntitiesFactory;
 import com.desenvolvedorindie.platformer.entity.system.*;
 import com.desenvolvedorindie.platformer.entity.system.debug.PathFindingDebugSystem;
 import com.desenvolvedorindie.platformer.entity.system.physic.MovementSystem;
+import com.desenvolvedorindie.platformer.entity.system.render.SpriteRenderSystem;
+import com.desenvolvedorindie.platformer.entity.system.render.SpriterAnimationRenderSystem;
 import com.desenvolvedorindie.platformer.entity.system.render.TileRenderSystem;
 import com.desenvolvedorindie.platformer.entity.system.world.CameraSystem;
+import com.desenvolvedorindie.platformer.entity.system.world.DayNightCycleSystem;
+import com.desenvolvedorindie.platformer.entity.system.world.PlayerControllerSystem;
 import com.desenvolvedorindie.platformer.entity.system.world.WaterSystem;
 import net.mostlyoriginal.api.event.common.EventSystem;
 import net.namekdev.entity_tracker.EntityTracker;
@@ -77,7 +81,7 @@ public class World implements IWorld {
     private com.desenvolvedorindie.platformer.entity.system.world.WaterSystem waterSystem;
     private com.desenvolvedorindie.platformer.entity.system.render.SpriterAnimationRenderSystem spriterAnimationRenderSystem;
     private WorldSerializationManager worldSerializationManager;
-    private com.desenvolvedorindie.platformer.entity.system.world.CameraSystem cameraSystem;
+    //private com.desenvolvedorindie.platformer.entity.system.world.CameraSystem cameraSystem;
     private com.desenvolvedorindie.platformer.entity.system.debug.CollisionDebugSystem collisionDebugSystem;
     private com.desenvolvedorindie.platformer.entity.system.debug.EntityDebugSystem entityDebugSystem;
     private EntityTrackerMainWindow entityTrackerWindow;
@@ -101,19 +105,19 @@ public class World implements IWorld {
                         new PlayerManager(),
                         new TagManager(),
                         new EventSystem(),
-                        new com.desenvolvedorindie.platformer.entity.system.world.PlayerControllerSystem(),
+                        new PlayerControllerSystem(),
                         new MovementSystem(this),
                         new StateSystem(),
                         new OperationSystem(),
-                        new com.desenvolvedorindie.platformer.entity.system.world.DayNightCycleSystem(),
+                        new DayNightCycleSystem(),
                         new WorldSerializationManager()
                 )
                 .with(Priority.LOW,
                         new TileRenderSystem(this, camera, batch),
-                        new com.desenvolvedorindie.platformer.entity.system.render.SpriteRenderSystem(camera, batch),
-                        new com.desenvolvedorindie.platformer.entity.system.render.SpriterAnimationRenderSystem(camera, batch),
-                        new WaterSystem(this, camera, shapeRenderer),
-                        new CameraSystem(this, camera, shapeRenderer)
+                        new SpriteRenderSystem(camera, batch),
+                        new SpriterAnimationRenderSystem(camera, batch),
+                        new WaterSystem(this, camera, shapeRenderer)
+                        //new CameraSystem(this, camera, shapeRenderer)
                 );
 
         //worldConfigBuilder.with(new EEELPlugin());
@@ -298,7 +302,7 @@ public class World implements IWorld {
     }
 
     public void update(float delta) {
-        artemis.setDelta(Math.min(delta, 1 / (float) Gdx.graphics.getFramesPerSecond()));
+        artemis.setDelta(delta);
         artemis.process();
 
         if (PlatformerGame.DEBUG) {
@@ -311,9 +315,11 @@ public class World implements IWorld {
             pathFindingDebugSystem.setEnabled(!pathFindingDebugSystem.isEnabled());
         }
 
+        /*
         if (Gdx.input.isKeyJustPressed(Input.Keys.F10)) {
             cameraSystem.setDebug(!cameraSystem.isDebug());
         }
+        */
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.F11)) {
             if (collisionDebugSystem != null) {

@@ -1,8 +1,9 @@
 uniform sampler2D u_texture;
+
 uniform vec2 u_resolution;
 
 //"in" attributes from our vertex shader
-varying vec2 v_texCoord0;
+varying vec2 v_texCoords;
 
 //RADIUS of our vignette, where 0.5 results in b circle fitting the screen
 const float RADIUS = 0.75;
@@ -15,7 +16,7 @@ const vec3 SEPIA = vec3(1.2, 1.0, 0.8);
 
 void main() {
     //sample our texture
-    vec4 texColor = texture2D(u_texture, v_texCoord0);
+    vec4 texColor = texture2D(u_texture, v_texCoords);
 
     //1. VIGNETTE
 

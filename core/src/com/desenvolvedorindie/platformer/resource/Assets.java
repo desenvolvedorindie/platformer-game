@@ -2,7 +2,7 @@ package com.desenvolvedorindie.platformer.resource;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
-import com.badlogic.gdx.assets.AssetLoaderParameters;
+import com.badlogic.gdx.assets.loaders.ShaderProgramLoader.ShaderProgramParameter;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -50,7 +51,7 @@ public class Assets {
     public static final AssetDescriptor<TextureAtlas> ui = new AssetDescriptor<>("ui/ui.atlas", TextureAtlas.class);
 
     @Asset
-    public static final AssetDescriptor<BitmapFont> FONT_HOBO_16 = new AssetDescriptor<>("fonts/hobo.ttf", BitmapFont.class, new FreetypeFontLoader.FreeTypeFontLoaderParameter() {
+    public static final AssetDescriptor<BitmapFont> FONT_HOBO_16 = new AssetDescriptor<>("fonts/hobo.ttf", BitmapFont.class, new FreeTypeFontLoaderParameter() {
         {
             fontFileName = "fonts/hobo.ttf";
             fontParameters = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -60,17 +61,61 @@ public class Assets {
 
     //Shaders
     @Asset
-    public static final AssetDescriptor<ShaderProgram> SHADER_PASSTHROUGH = new AssetDescriptor<>("shaders/passthrough.vert", ShaderProgram.class);
+    public static final AssetDescriptor<ShaderProgram> SHADER_GREYSCALE = new AssetDescriptor<>("greyscale", ShaderProgram.class, new ShaderProgramParameter() {
+        {
+            vertexFile = "shaders/pass.vert";
+            fragmentFile = "shaders/greyscale.frag";
+        }
+    });
     @Asset
-    public static final AssetDescriptor<ShaderProgram> SHADER_VIGNETTE = new AssetDescriptor<>("shaders/vignette.vert", ShaderProgram.class);
+    public static final AssetDescriptor<ShaderProgram> SHADER_INVERT = new AssetDescriptor<>("invert", ShaderProgram.class, new ShaderProgramParameter() {
+        {
+            vertexFile = "shaders/pass.vert";
+            fragmentFile = "shaders/invert.frag";
+        }
+    });
     @Asset
-    public static final AssetDescriptor<ShaderProgram> SHADER_INVERT = new AssetDescriptor<>("shaders/invert.vert", ShaderProgram.class);
+    public static final AssetDescriptor<ShaderProgram> SHADER_VIGNETTE = new AssetDescriptor<>("vignette", ShaderProgram.class, new ShaderProgramParameter() {
+        {
+            vertexFile = "shaders/pass.vert";
+            fragmentFile = "shaders/vignette.frag";
+        }
+    });
     @Asset
-    public static final AssetDescriptor<ShaderProgram> SHADER_EMBOSS = new AssetDescriptor<>("shaders/emboss.vert", ShaderProgram.class);
+    public static final AssetDescriptor<ShaderProgram> SHADER_EMBOSS = new AssetDescriptor<>("emboss", ShaderProgram.class, new ShaderProgramParameter() {
+        {
+            vertexFile = "shaders/pass.vert";
+            fragmentFile = "shaders/emboss.frag";
+        }
+    });
     @Asset
-    public static final AssetDescriptor<ShaderProgram> SHADER_SEPIA = new AssetDescriptor<>("shaders/sepia.vert", ShaderProgram.class);
+    public static final AssetDescriptor<ShaderProgram> SHADER_SEPIA = new AssetDescriptor<>("sepia", ShaderProgram.class, new ShaderProgramParameter() {
+        {
+            vertexFile = "shaders/pass.vert";
+            fragmentFile = "shaders/sepia.frag";
+        }
+    });
     @Asset
-    public static final AssetDescriptor<ShaderProgram> SHADER_SKY = new AssetDescriptor<>("shaders/sky.vert", ShaderProgram.class);
+    public static final AssetDescriptor<ShaderProgram> SHADER_BLACKANDWHITE = new AssetDescriptor<>("blackandwhite", ShaderProgram.class, new ShaderProgramParameter() {
+        {
+            vertexFile = "shaders/pass.vert";
+            fragmentFile = "shaders/blackandwhite.frag";
+        }
+    });
+    @Asset
+    public static final AssetDescriptor<ShaderProgram> SHADER_SHADOWMAP = new AssetDescriptor<ShaderProgram>("shadowmap", ShaderProgram.class, new ShaderProgramParameter() {
+        {
+            vertexFile = "shaders/pass.vert";
+            fragmentFile = "shaders/shadowmap.frag";
+        }
+    });
+    @Asset
+    public static final AssetDescriptor<ShaderProgram> SHADER_SHADOWRENDER = new AssetDescriptor<ShaderProgram>("shadowrender", ShaderProgram.class, new ShaderProgramParameter() {
+        {
+            vertexFile = "shaders/pass.vert";
+            fragmentFile = "shaders/shadowrender.frag";
+        }
+    });
 
     //Dungeons
     @Asset
@@ -90,12 +135,13 @@ public class Assets {
     }
 
     public static void debug() {
-        Gdx.app.log("PASSTHROUGH", manager.get(SHADER_PASSTHROUGH).isCompiled() ? "Compiled" : manager.get(SHADER_PASSTHROUGH).getLog());
-        Gdx.app.log("VIGNETTE", manager.get(SHADER_VIGNETTE).isCompiled() ? "Compiled" : manager.get(SHADER_VIGNETTE).getLog());
+        Gdx.app.log("GREYSCALE", manager.get(SHADER_GREYSCALE).isCompiled() ? "Compiled" : manager.get(SHADER_GREYSCALE).getLog());
         Gdx.app.log("INVERT", manager.get(SHADER_INVERT).isCompiled() ? "Compiled" : manager.get(SHADER_INVERT).getLog());
+        Gdx.app.log("VIGNETTE", manager.get(SHADER_VIGNETTE).isCompiled() ? "Compiled" : manager.get(SHADER_VIGNETTE).getLog());
         Gdx.app.log("EMBOSS", manager.get(SHADER_EMBOSS).isCompiled() ? "Compiled" : manager.get(SHADER_EMBOSS).getLog());
         Gdx.app.log("SEPIA", manager.get(SHADER_SEPIA).isCompiled() ? "Compiled" : manager.get(SHADER_SEPIA).getLog());
-        Gdx.app.log("SKY", manager.get(SHADER_SKY).isCompiled() ? "Compiled" : manager.get(SHADER_SKY).getLog());
+        Gdx.app.log("SHADOWMAP", manager.get(SHADER_SHADOWMAP).isCompiled() ? "Compiled" : manager.get(SHADER_SHADOWMAP).getLog());
+        Gdx.app.log("SHADOWRENDER", manager.get(SHADER_SHADOWRENDER).isCompiled() ? "Compiled" : manager.get(SHADER_SHADOWRENDER).getLog());
     }
 
 }
