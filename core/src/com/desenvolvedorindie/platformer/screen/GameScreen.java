@@ -5,22 +5,18 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.desenvolvedorindie.platformer.PlatformerGame;
 import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.render.SpriterAnimationComponent;
 import com.desenvolvedorindie.platformer.entity.system.render.SpriterAnimationRenderSystem;
 import com.desenvolvedorindie.platformer.entity.system.render.TileRenderSystem;
 import com.desenvolvedorindie.platformer.entity.system.world.PlayerControllerSystem;
@@ -31,6 +27,8 @@ import com.desenvolvedorindie.platformer.scene2d.GameHud;
 import com.desenvolvedorindie.platformer.world.World;
 import net.spookygames.gdx.gfx.MultiTemporalVisualEffect;
 import net.spookygames.gdx.gfx.VisualEffect;
+
+import java.util.Random;
 
 public class GameScreen extends ScreenAdapter {
 
@@ -45,16 +43,8 @@ public class GameScreen extends ScreenAdapter {
     private Stage stage;
     private GameHud gameHud;
     private Skin skin;
-    private int lightSize = 512;
-    private float upScale = 1f;
-    private TextureRegion shadowMap1D;
-    private TextureRegion occluders;
-    private FrameBuffer shadowMapFBO;
-    private FrameBuffer occludersFBO;
     private Array<Light> lights = new Array<Light>();
-    private boolean softShadows = false;
-    private boolean shadowsBlur = false;
-
+    private Vector3 u = new Vector3();
 
     static Color randomColor() {
         float intensity = (float) Math.random() * 0.5f + 0.5f;
@@ -93,13 +83,15 @@ public class GameScreen extends ScreenAdapter {
         TransformComponent cTransform = world.getArtemis().getEntity(world.getPlayer()).getComponent(TransformComponent.class);
         cTransform.position.y = World.mapToWorld(world.getHeightMap(World.worldToMap(cTransform.position.x)) + 1);
 
+        final Random random = new Random();
+
         InputProcessor playerInput = world.getArtemis().getSystem(PlayerControllerSystem.class).getPlayerInputAdapter();
         Gdx.input.setInputProcessor(new InputMultiplexer(stage, playerInput, new InputAdapter() {
 
             public boolean touchDown(int x, int y, int pointer, int button) {
-                float mx = x;
-                float my = Gdx.graphics.getHeight() - y;
-                Light l = new Light(mx, my, randomColor());
+                u.set(x, y, 0);
+                camera.unproject(u);
+                Light l = new Light(u.x, u.y, randomColor(), random.nextInt(1024));
                 lights.add(l);
                 return true;
             }
@@ -110,27 +102,15 @@ public class GameScreen extends ScreenAdapter {
         guiEffect = new MultiTemporalVisualEffect(Format.RGBA8888, false);
 
         //Draw
-
-        occludersFBO = new FrameBuffer(Format.RGBA8888, lightSize, lightSize, false);
-        occluders = new TextureRegion(occludersFBO.getColorBufferTexture());
-        occluders.flip(false, true);
-
-        shadowMapFBO = new FrameBuffer(Format.RGBA8888, lightSize, 1, false);
-        Texture shadowMapTex = shadowMapFBO.getColorBufferTexture();
-
-        shadowMapTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        shadowMapTex.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-
-        shadowMap1D = new TextureRegion(shadowMapTex);
-        shadowMap1D.flip(false, true);
-
-
         clearLights();
     }
 
     void clearLights() {
+        for (Light light : lights) {
+            light.dispose();
+        }
         lights.clear();
-        lights.add(new Light(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), randomColor()));
+        lights.add(new Light(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), Color.WHITE, 1024));
     }
 
     @Override
@@ -140,19 +120,18 @@ public class GameScreen extends ScreenAdapter {
         stage.act(delta);
 
         /* Draw */
-        Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        float mx = Gdx.input.getX();
-        float my = Gdx.graphics.getHeight() - Gdx.input.getY();
-
+        u.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+        camera.unproject(u);
 
         // GAME
         for (int i = 0; i < lights.size; i++) {
             Light o = lights.get(i);
 
             if (i == lights.size - 1) {
-                o.position.set(mx, my);
+                o.position.set(u.x, u.y);
             }
 
             renderLight(o);
@@ -169,13 +148,15 @@ public class GameScreen extends ScreenAdapter {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         gameEffect.render(gameEffect.endCapture(), null);
 
+        Light lastLight = lights.peek();
         // DEBUG LIGHT
+        /*
         batch.begin();
         batch.setShader(null);
         batch.setColor(Color.BLACK);
-        batch.draw(occluders, 0, 0);
+        batch.draw(lastLight.getOccluders(), 0, 0);
         batch.setColor(Color.WHITE);
-        batch.draw(shadowMap1D, 0, lightSize + 5);
+        batch.draw(lastLight.getShadowMap1D(), 0, lastLight.getLightSize() + 5);
         batch.end();
 
         // GUI
@@ -186,118 +167,43 @@ public class GameScreen extends ScreenAdapter {
         stage.draw();
         Gdx.gl.glEnable(GL20.GL_BLEND);
         guiEffect.render(guiEffect.endCapture(), null);
+        */
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
             next();
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
+        float d = 50f;
+
+        lastLight.start += Math.PI / d;
+
+        lastLight.end += Math.PI / d  / 2;
+
+        if (Gdx.input.isKeyPressed(Input.Keys.Y)) {
             clearLights();
-        } else if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-            softShadows = !softShadows;
-            Gdx.app.log("softShadows", String.valueOf(softShadows));
         }
     }
 
-    private void renderLight(Light o) {
-        Matrix4 combined = camera.combined.cpy();
+    private void renderLight(Light light) {
+        int startX = Math.max(0, World.worldToMap(light.position.x - light.getLightSize() / 2f));
+        int startY = Math.max(0, World.worldToMap(light.position.y - light.getLightSize() / 2f));
+        int endX = Math.min(world.getWidth(), World.worldToMap(light.position.x + light.getLightSize() / 2f));
+        int endY = Math.min(world.getHeight(), World.worldToMap(light.position.y + light.getLightSize() / 2f));
 
-        float mx = o.position.x;
-        float my = o.position.y;
+        light.startOccluder(camera, batch);
 
-        //STEP 1. render light region to occluder FBO
-
-        //bind the occluder FBO
-        occludersFBO.begin();
-
-        //clear the FBO
-        Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        //set the orthographic camera to the size of our FBO
-        camera.setToOrtho(false, occludersFBO.getWidth(), occludersFBO.getHeight());
-
-        //translate camera so that light is in the center
-        camera.translate(mx - lightSize / 2f, my - lightSize / 2f);
-        camera.update();
-
-        int startX = Math.max(0, World.worldToMap(mx - lightSize / 2f));
-        int startY = Math.max(0, World.worldToMap(my - lightSize / 2f));
-        int endX = Math.min(world.getWidth(), World.worldToMap(mx + lightSize / 2f));
-        int endY = Math.min(world.getHeight(), World.worldToMap(my + lightSize / 2f));
-
-        //set up our batch for the occluder pass
-        batch.setProjectionMatrix(camera.combined);
         batch.setShader(null); //use default shader
+
         batch.begin();
         // ... draw any sprites that will cast shadows here ... //
         world.getArtemis().getSystem(TileRenderSystem.class).renderForeground(batch, startX, startY, endX, endY);
-        world.getArtemis().getSystem(SpriterAnimationRenderSystem.class).processEntity(world.getPlayer());
+        world.getArtemis().getSystem(SpriterAnimationRenderSystem.class).render(world.getArtemis().getEntity(world.getPlayer()).getComponent(SpriterAnimationComponent.class).spriterAnimator);
 
-        //end the batch before unbinding the FBO
         batch.end();
 
-        //unbind the FBO
-        occludersFBO.end();
+        light.endOccluder();
 
-        //STEP 2. build a 1D shadow map from occlude FBO
-
-        //bind shadow map
-        shadowMapFBO.begin();
-
-        //clear it
-        Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        //set our shadow map shader
-        ShaderProgram shadowMapShader = Assets.manager.get(Assets.SHADER_SHADOWMAP);
-        batch.setShader(shadowMapShader);
-        batch.begin();
-        shadowMapShader.setUniformf("resolution", lightSize, lightSize);
-        shadowMapShader.setUniformf("upScale", upScale);
-
-        //reset our projection matrix to the FBO size
-        camera.setToOrtho(false, shadowMapFBO.getWidth(), shadowMapFBO.getHeight());
-        batch.setProjectionMatrix(camera.combined);
-
-        //draw the occluders texture to our 1D shadow map FBO
-        batch.draw(occluders.getTexture(), 0, 0, lightSize, shadowMapFBO.getHeight());
-
-        //flush batch
-        batch.end();
-
-        //unbind shadow map FBO
-        shadowMapFBO.end();
-
-        //STEP 3. render the blurred shadows
-
-        //reset projection matrix to screen
-        camera.setToOrtho(false);
-        batch.setProjectionMatrix(camera.combined);
-
-        //set the shader which actually draws the light/shadow
-        ShaderProgram shadowRenderShader = Assets.manager.get(Assets.SHADER_SHADOWRENDER);
-
-        batch.setShader(shadowRenderShader);
-        batch.begin();
-
-        shadowRenderShader.setUniformf("u_resolution", lightSize, lightSize);
-        shadowRenderShader.setUniformf("u_softShadows", softShadows ? 1f : 0f);
-        //set color to light
-        batch.setColor(o.color);
-
-        float finalSize = lightSize * upScale;
-
-        //draw centered on light position
-        batch.draw(shadowMap1D.getTexture(), mx - finalSize / 2f, my - finalSize / 2f, finalSize, finalSize);
-
-        //flush the batch before swapping shaders
-        batch.end();
-
-        //reset color
-        batch.setColor(Color.WHITE);
-
-        camera.combined.set(combined);
+        light.renderShadowMap();
     }
 
     private void next() {

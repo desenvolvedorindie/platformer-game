@@ -21,6 +21,7 @@ buildscript {
         gdxCamerasVersion = "0.0.4"
         luaJVersion = "2.0"
         bte2Version = "master-SNAPSHOT"
+        kryonet = "2.22.0-RC1"
         jUnitVersion = "4.12"
         mockitoVersion = "2.+"
     }
@@ -215,6 +216,7 @@ project(":core") {
         compile "com.github.spookygames:gdx-gfx:$gdxGfxVersion"
         compile "com.github.desenvolvedorindie.gdx-cameras:core:$gdxCamerasVersion"
         compile "org.luaj:luaj-jse:$luaJVersion"
+        compile "com.esotericsoftware:kryonet:$kryonet"
         testCompile "junit:junit:$jUnitVersion"
         testCompile "org.mockito:mockito-core:$mockitoVersion"
     }

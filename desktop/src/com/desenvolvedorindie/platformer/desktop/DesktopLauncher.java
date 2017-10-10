@@ -11,6 +11,7 @@ public class DesktopLauncher {
         config.setWindowedMode(PlatformerGame.GAME_WIDTH, PlatformerGame.GAME_HEIGHT);
         config.setResizable(false);
         config.useVsync(true);
+        config.setIdleFPS(0);
         config.setTitle(PlatformerGame.NAME);
         new Lwjgl3Application(new PlatformerGame(), config);
     }

@@ -3,6 +3,7 @@ package com.desenvolvedorindie.platformer.entity.system.physic;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -37,12 +38,6 @@ public class MovementSystem extends IteratingSystem {
 
         if (cRigidBody.isKinematic) {
             float delta = super.world.getDelta();
-
-            if (delta == 0) return;
-
-            if (cRigidBody.useGravity) {
-                cRigidBody.velocity.y += world.getGravity() * cRigidBody.gravityMultiplier * delta;
-            }
 
             if (mCollidable.has(entityId)) {
                 cCollidable.onGround = false;
@@ -92,8 +87,8 @@ public class MovementSystem extends IteratingSystem {
                     }
 
                     if (found) {
-                        rectangle.y = oldY;
                         velocity.y = 0;
+                        rectangle.y = oldY;
                         break;
                     }
                 }
@@ -130,8 +125,8 @@ public class MovementSystem extends IteratingSystem {
                     }
 
                     if (found) {
-                        rectangle.x = oldX;
                         velocity.x = 0;
+                        rectangle.x = oldX;
                         break;
                     }
                 }
@@ -143,6 +138,10 @@ public class MovementSystem extends IteratingSystem {
                 cRigidBody.velocity.set(velocity);
             } else {
                 cTransform.position.mulAdd(cRigidBody.velocity, delta);
+            }
+
+            if (cRigidBody.useGravity) {
+                cRigidBody.velocity.y += world.getGravity() * cRigidBody.gravityMultiplier * delta;
             }
         }
     }

@@ -116,8 +116,8 @@ public class World implements IWorld {
                         new TileRenderSystem(this, camera, batch),
                         new SpriteRenderSystem(camera, batch),
                         new SpriterAnimationRenderSystem(camera, batch),
-                        new WaterSystem(this, camera, shapeRenderer)
-                        //new CameraSystem(this, camera, shapeRenderer)
+                        new WaterSystem(this, camera, shapeRenderer),
+                        new CameraSystem(this, camera, shapeRenderer)
                 );
 
         //worldConfigBuilder.with(new EEELPlugin());

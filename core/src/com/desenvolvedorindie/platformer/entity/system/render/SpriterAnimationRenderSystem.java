@@ -36,10 +36,6 @@ public class SpriterAnimationRenderSystem extends IteratingSystem {
         batch.begin();
     }
 
-    public void processEntity(int entityId) {
-        process(entityId);
-    }
-
     @Override
     protected void process(int entityId) {
         TransformComponent cTransform = mTransform.get(entityId);
