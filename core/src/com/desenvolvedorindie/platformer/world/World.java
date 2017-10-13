@@ -1,5 +1,6 @@
 package com.desenvolvedorindie.platformer.world;
 
+import com.artemis.Entity;
 import com.artemis.WorldConfiguration;
 import com.artemis.WorldConfigurationBuilder;
 import com.artemis.io.JsonArtemisSerializer;
@@ -19,6 +20,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -31,7 +33,8 @@ import com.desenvolvedorindie.platformer.block.Block;
 import com.desenvolvedorindie.platformer.block.water.Grid;
 import com.desenvolvedorindie.platformer.dictionary.Blocks;
 import com.desenvolvedorindie.platformer.entity.EntitiesFactory;
-import com.desenvolvedorindie.platformer.entity.system.*;
+import com.desenvolvedorindie.platformer.entity.component.basic.PositionComponent;
+import com.desenvolvedorindie.platformer.entity.system.StateSystem;
 import com.desenvolvedorindie.platformer.entity.system.debug.PathFindingDebugSystem;
 import com.desenvolvedorindie.platformer.entity.system.physic.MovementSystem;
 import com.desenvolvedorindie.platformer.entity.system.render.SpriteRenderSystem;
@@ -41,7 +44,10 @@ import com.desenvolvedorindie.platformer.entity.system.world.CameraSystem;
 import com.desenvolvedorindie.platformer.entity.system.world.DayNightCycleSystem;
 import com.desenvolvedorindie.platformer.entity.system.world.PlayerControllerSystem;
 import com.desenvolvedorindie.platformer.entity.system.world.WaterSystem;
+import com.desenvolvedorindie.platformer.network.data.Player;
+import com.desenvolvedorindie.platformer.network.data.PlayerUpdate;
 import net.mostlyoriginal.api.event.common.EventSystem;
+import net.mostlyoriginal.plugin.ProfilerPlugin;
 import net.namekdev.entity_tracker.EntityTracker;
 import net.namekdev.entity_tracker.ui.EntityTrackerMainWindow;
 import se.feomedia.orion.system.OperationSystem;
@@ -135,6 +141,8 @@ public class World implements IWorld {
                         new EntityTracker(entityTrackerWindow = new EntityTrackerMainWindow(false, false))
                 );
             }
+
+            worldConfigBuilder.dependsOn(ProfilerPlugin.class);
         }
 
         WorldConfiguration config = worldConfigBuilder.build();
@@ -151,6 +159,8 @@ public class World implements IWorld {
         artemis.inject(entitiesFactory);
 
         player = entitiesFactory.createPlayer(mapToWorld(1), mapToWorld(getHeight() - 3));
+
+        artemis.getSystem(PlayerManager.class).setPlayer(artemis.getEntity(player), "player" + MathUtils.random(1000));
 
         if (collisionDebugSystem != null) {
             collisionDebugSystem.setEnabled(false);
@@ -559,4 +569,27 @@ public class World implements IWorld {
         init();
     }
 
+    synchronized public void addPlayer(Player playerData) {
+        if (!artemis.getSystem(PlayerManager.class).getPlayer(artemis.getEntity(player)).equals(playerData.name)) {
+            int e = entitiesFactory.createOtherPlayer(playerData.x, playerData.y);
+            artemis.getSystem(PlayerManager.class).setPlayer(artemis.getEntity(e), playerData.name);
+        }
+    }
+
+
+    synchronized public void updatePlayer(PlayerUpdate playerUpdate) {
+
+        if (!artemis.getSystem(PlayerManager.class).getPlayer(artemis.getEntity(player)).equals(playerUpdate.name)) {
+            Entity e = artemis.getSystem(PlayerManager.class).getEntitiesOfPlayer(playerUpdate.name).get(0);
+            if (e != null) {
+                e.getComponent(PositionComponent.class).position.set(playerUpdate.x, playerUpdate.y);
+            }
+        }
+    }
+
+    synchronized public void removePlayer(String name) {
+        for (Entity entity : artemis.getSystem(PlayerManager.class).getEntitiesOfPlayer(name)) {
+            entity.deleteFromWorld();
+        }
+    }
 }

@@ -3,21 +3,23 @@ package com.desenvolvedorindie.platformer.entity.system.render;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.basic.OriginComponent;
+import com.desenvolvedorindie.platformer.entity.component.basic.PositionComponent;
+import com.desenvolvedorindie.platformer.entity.component.basic.RotationComponent;
+import com.desenvolvedorindie.platformer.entity.component.basic.ScaleComponent;
 import com.desenvolvedorindie.platformer.entity.component.render.GFXComponent;
 import com.desenvolvedorindie.platformer.entity.component.render.SpriterAnimationComponent;
 import net.spookygames.gdx.spriter.SpriterAnimator;
 
 public class SpriterAnimationRenderSystem extends IteratingSystem {
 
-    private ComponentMapper<TransformComponent> mTransform;
-
+    private ComponentMapper<PositionComponent> mPosition;
+    private ComponentMapper<OriginComponent> mOrigin;
+    private ComponentMapper<ScaleComponent> mScale;
+    private ComponentMapper<RotationComponent> mRotation;
     private ComponentMapper<SpriterAnimationComponent> mSpriterAnimation;
-
     private ComponentMapper<GFXComponent> mGFX;
 
     private OrthographicCamera camera;
@@ -25,7 +27,12 @@ public class SpriterAnimationRenderSystem extends IteratingSystem {
     private SpriteBatch batch;
 
     public SpriterAnimationRenderSystem(OrthographicCamera camera, SpriteBatch batch) {
-        super(Aspect.all(TransformComponent.class, SpriterAnimationComponent.class));
+        super(Aspect.all(
+                PositionComponent.class,
+                OriginComponent.class,
+                ScaleComponent.class,
+                SpriterAnimationComponent.class
+        ));
         this.camera = camera;
         this.batch = batch;
     }
@@ -38,19 +45,22 @@ public class SpriterAnimationRenderSystem extends IteratingSystem {
 
     @Override
     protected void process(int entityId) {
-        TransformComponent cTransform = mTransform.get(entityId);
+        PositionComponent cPosition = mPosition.get(entityId);
+        OriginComponent cOrigin = mOrigin.get(entityId);
+        ScaleComponent cScale = mScale.get(entityId);
+        RotationComponent cRotation = mRotation.get(entityId);
         SpriterAnimationComponent cSpriterAnimation = mSpriterAnimation.get(entityId);
         GFXComponent cGFX = mGFX.get(entityId);
 
         SpriterAnimator spriterAnimation = cSpriterAnimation.spriterAnimator;
 
-        spriterAnimation.setPivot(cTransform.origin.x, cTransform.origin.y);
+        spriterAnimation.setPivot(cOrigin.origin.x, cOrigin.origin.y);
 
-        spriterAnimation.setScale(cTransform.scaleX, cTransform.scaleY);
+        spriterAnimation.setScale(cScale.scaleX, cScale.scaleY);
 
-        spriterAnimation.setAngle(cTransform.rotation);
+        spriterAnimation.setAngle(cRotation.rotation);
 
-        spriterAnimation.setPosition(cTransform.position.x + 10, cTransform.position.y);
+        spriterAnimation.setPosition(cPosition.position.x + 10, cPosition.position.y);
 
         spriterAnimation.setSpeed(cSpriterAnimation.speed);
 

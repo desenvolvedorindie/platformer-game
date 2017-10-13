@@ -3,7 +3,7 @@ apply plugin: "java"
 sourceCompatibility = 1.7
 sourceSets.main.java.srcDirs = [ "src/" ]
 
-project.ext.mainClassName = "io.piotrjastrzebski.bte.desktop.AIEditorTestProject"
+project.ext.mainClassName = "io.piotrjastrzebski.bte.desktop.BTEditor"
 //project.ext.assetsDir = new File("../bte/assets");
 
 task run(dependsOn: classes, type: JavaExec) {

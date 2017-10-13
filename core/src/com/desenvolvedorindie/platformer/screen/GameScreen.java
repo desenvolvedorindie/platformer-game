@@ -1,6 +1,8 @@
 package com.desenvolvedorindie.platformer.screen;
 
+import com.artemis.managers.PlayerManager;
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -8,20 +10,22 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.desenvolvedorindie.platformer.PlatformerGame;
-import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.basic.PositionComponent;
 import com.desenvolvedorindie.platformer.entity.component.render.SpriterAnimationComponent;
 import com.desenvolvedorindie.platformer.entity.system.render.SpriterAnimationRenderSystem;
 import com.desenvolvedorindie.platformer.entity.system.render.TileRenderSystem;
 import com.desenvolvedorindie.platformer.entity.system.world.PlayerControllerSystem;
 import com.desenvolvedorindie.platformer.graphics.Light;
 import com.desenvolvedorindie.platformer.graphics.fx.*;
+import com.desenvolvedorindie.platformer.network.GameClient;
+import com.desenvolvedorindie.platformer.network.data.Login;
+import com.desenvolvedorindie.platformer.network.data.MovePlayer;
 import com.desenvolvedorindie.platformer.resource.Assets;
 import com.desenvolvedorindie.platformer.scene2d.GameHud;
 import com.desenvolvedorindie.platformer.world.World;
@@ -34,6 +38,8 @@ public class GameScreen extends ScreenAdapter {
 
     int current = 0;
     VisualEffect greyscale = new Greyscale(), invert = new Invert(), vignette = new Vignette(), emboss = new Emboss(), sepia = new Sepia(), blackAndWhite = new BlackAndWhite();
+    GameClient client;
+
     private MultiTemporalVisualEffect gameEffect, guiEffect;
     private World world;
     private SpriteBatch batch;
@@ -45,6 +51,7 @@ public class GameScreen extends ScreenAdapter {
     private Skin skin;
     private Array<Light> lights = new Array<Light>();
     private Vector3 u = new Vector3();
+    private MovePlayer movePlayer;
 
     static Color randomColor() {
         float intensity = (float) Math.random() * 0.5f + 0.5f;
@@ -80,7 +87,7 @@ public class GameScreen extends ScreenAdapter {
         world.regenerate();
         //world.load(tiledMap);
 
-        TransformComponent cTransform = world.getArtemis().getEntity(world.getPlayer()).getComponent(TransformComponent.class);
+        PositionComponent cTransform = world.getArtemis().getEntity(world.getPlayer()).getComponent(PositionComponent.class);
         cTransform.position.y = World.mapToWorld(world.getHeightMap(World.worldToMap(cTransform.position.x)) + 1);
 
         final Random random = new Random();
@@ -126,6 +133,7 @@ public class GameScreen extends ScreenAdapter {
         u.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(u);
 
+        /*
         // GAME
         for (int i = 0; i < lights.size; i++) {
             Light o = lights.get(i);
@@ -136,6 +144,7 @@ public class GameScreen extends ScreenAdapter {
 
             renderLight(o);
         }
+        */
 
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
@@ -169,7 +178,7 @@ public class GameScreen extends ScreenAdapter {
         guiEffect.render(guiEffect.endCapture(), null);
         */
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
+        if (Gdx.input.isKeyJustPressed(Keys.N)) {
             next();
         }
 
@@ -177,10 +186,26 @@ public class GameScreen extends ScreenAdapter {
 
         lastLight.start += Math.PI / d;
 
-        lastLight.end += Math.PI / d  / 2;
+        lastLight.end += Math.PI / d / 2;
 
-        if (Gdx.input.isKeyPressed(Input.Keys.Y)) {
+        if (Gdx.input.isKeyPressed(Keys.L)) {
             clearLights();
+        }
+
+        if (Gdx.input.isKeyJustPressed(Keys.C) && client == null) {
+            String name = world.getArtemis().getSystem(PlayerManager.class).getPlayer(world.getArtemis().getEntity(world.getPlayer()));
+            client = new GameClient(world, name);
+            Login login = new Login();
+            login.name = name;
+            client.login(login);
+        }
+
+        if (client != null && client.isConnected()) {
+            PositionComponent cTransform = world.getArtemis().getEntity(world.getPlayer()).getComponent(PositionComponent.class);
+            movePlayer = new MovePlayer();
+            movePlayer.x = cTransform.position.x;
+            movePlayer.y = cTransform.position.y;
+            client.movePlayer(movePlayer);
         }
     }
 

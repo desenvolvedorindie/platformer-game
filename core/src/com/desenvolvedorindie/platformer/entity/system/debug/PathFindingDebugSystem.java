@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.desenvolvedorindie.platformer.ai.pathfind.flat.FlatTiledNode;
 import com.desenvolvedorindie.platformer.block.Block;
-import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.basic.PositionComponent;
 import com.desenvolvedorindie.platformer.world.World;
 
 public class PathFindingDebugSystem extends BaseSystem {
@@ -37,8 +37,8 @@ public class PathFindingDebugSystem extends BaseSystem {
 
                 gameWorld.lastScreenX = World.worldToMap(mousePos.x);
                 gameWorld.lastScreenY = World.worldToMap(mousePos.y);
-                gameWorld.startTileX = Math.round(gameWorld.getArtemis().getEntity(gameWorld.getPlayer()).getComponent(TransformComponent.class).position.x / Block.TILE_SIZE);
-                gameWorld.startTileY = Math.round(gameWorld.getArtemis().getEntity(gameWorld.getPlayer()).getComponent(TransformComponent.class).position.y / Block.TILE_SIZE);
+                gameWorld.startTileX = Math.round(gameWorld.getArtemis().getEntity(gameWorld.getPlayer()).getComponent(PositionComponent.class).position.x / Block.TILE_SIZE);
+                gameWorld.startTileY = Math.round(gameWorld.getArtemis().getEntity(gameWorld.getPlayer()).getComponent(PositionComponent.class).position.y / Block.TILE_SIZE);
                 gameWorld.updatePath(false);
             }
         }

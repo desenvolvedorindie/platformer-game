@@ -14,8 +14,8 @@ import com.badlogic.gdx.ai.btree.utils.BehaviorTreeLibrary;
 import com.badlogic.gdx.ai.btree.utils.BehaviorTreeLibraryManager;
 import com.badlogic.gdx.ai.btree.utils.BehaviorTreeParser;
 import com.badlogic.gdx.ai.utils.random.TriangularIntegerDistribution;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -34,8 +34,8 @@ import io.piotrjastrzebski.bte.EditorBehaviourTreeLibrary;
 /**
  * Created by EvilEntity on 04/02/2016.
  */
-public class AIEditorTestProject extends Game {
-	private static final String TAG = AIEditorTestProject.class.getSimpleName();
+public class BTEditor extends Game {
+	private static final String TAG = BTEditor.class.getSimpleName();
 
 	private SpriteBatch batch;
 	private Stage stage;
@@ -232,9 +232,9 @@ public class AIEditorTestProject extends Game {
 	}
 
 	public static void main (String[] args) {
-		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setWindowedMode(800, 600);
-		config.setHdpiMode(Lwjgl3ApplicationConfiguration.HdpiMode.Logical);
-		new Lwjgl3Application(new AIEditorTestProject(), config);
+		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.width = 800;
+		config.height = 600;
+		new LwjglApplication(new BTEditor(), config);
 	}
 }

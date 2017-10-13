@@ -2,7 +2,7 @@ package com.desenvolvedorindie.platformer.network.data;
 
 public class PlayerUpdate {
 
-    public int id = -1;
+    public String name;
     public float x;
     public float y;
     public float vx;

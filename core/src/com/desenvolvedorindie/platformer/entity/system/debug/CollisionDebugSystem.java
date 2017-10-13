@@ -8,20 +8,17 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.desenvolvedorindie.platformer.entity.component.basic.PositionComponent;
 import com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent;
 import com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent;
-import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
 import com.desenvolvedorindie.platformer.world.World;
 
 import static com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line;
 
 public class CollisionDebugSystem extends IteratingSystem {
 
-    private ComponentMapper<TransformComponent> mTransform;
-
-    private ComponentMapper<CollidableComponent> mCollidable;
-
     private ComponentMapper<RigidBodyComponent> mRigidBody;
+    private ComponentMapper<CollidableComponent> mCollidable;
 
     private World gameWorld;
 
@@ -29,8 +26,13 @@ public class CollisionDebugSystem extends IteratingSystem {
 
     private ShapeRenderer shapeRenderer;
 
+    Vector2 minTemp = new Vector2(), maxTemp = new Vector2(), sizeTemp = new Vector2(), centerTemp = new Vector2();
+
     public CollisionDebugSystem(World world, Camera camera, ShapeRenderer shapeRenderer) {
-        super(Aspect.all(TransformComponent.class, RigidBodyComponent.class, CollidableComponent.class));
+        super(Aspect.all(
+                RigidBodyComponent.class,
+                CollidableComponent.class)
+        );
         this.gameWorld = world;
         this.camera = camera;
         this.shapeRenderer = shapeRenderer;
@@ -56,14 +58,13 @@ public class CollisionDebugSystem extends IteratingSystem {
 
     @Override
     protected void process(int entityId) {
-        TransformComponent cTransform = mTransform.get(entityId);
         RigidBodyComponent cRigidBody = mRigidBody.get(entityId);
         CollidableComponent cCollidable = mCollidable.get(entityId);
 
-        Vector2 min = cCollidable.collisionBox.getPosition(new Vector2());
-        Vector2 max = cCollidable.collisionBox.getSize(new Vector2()).add(min);
-        Vector2 size = cCollidable.collisionBox.getSize(new Vector2());
-        Vector2 center = cCollidable.collisionBox.getCenter(new Vector2());
+        Vector2 min = cCollidable.collisionBox.getPosition(minTemp);
+        Vector2 max = cCollidable.collisionBox.getSize(maxTemp).add(min);
+        Vector2 size = cCollidable.collisionBox.getSize(sizeTemp);
+        Vector2 center = cCollidable.collisionBox.getCenter(centerTemp);
 
         shapeRenderer.setColor(Color.GREEN);
         shapeRenderer.rect(min.x, min.y, size.x, size.y);

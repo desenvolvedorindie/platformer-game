@@ -3,22 +3,19 @@ package com.desenvolvedorindie.platformer.entity.system.physic;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent;
 import com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent;
-import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.basic.PositionComponent;
 import com.desenvolvedorindie.platformer.world.World;
 
 public class MovementSystem extends IteratingSystem {
 
+    private ComponentMapper<PositionComponent> mPosition;
     private ComponentMapper<CollidableComponent> mCollidable;
-
     private ComponentMapper<RigidBodyComponent> mRigidBody;
-
-    private ComponentMapper<TransformComponent> mTransform;
 
     private World world;
 
@@ -26,14 +23,17 @@ public class MovementSystem extends IteratingSystem {
     private Vector2 velocity = new Vector2();
 
     public MovementSystem(World world) {
-        super(Aspect.all(TransformComponent.class, RigidBodyComponent.class));
+        super(Aspect.all(
+                PositionComponent.class,
+                RigidBodyComponent.class
+        ));
         this.world = world;
     }
 
     @Override
     protected void process(int entityId) {
+        PositionComponent cPosition = mPosition.get(entityId);
         RigidBodyComponent cRigidBody = mRigidBody.get(entityId);
-        TransformComponent cTransform = mTransform.get(entityId);
         CollidableComponent cCollidable = mCollidable.get(entityId);
 
         if (cRigidBody.isKinematic) {
@@ -50,7 +50,7 @@ public class MovementSystem extends IteratingSystem {
                 velocity.scl(delta);
 
                 Rectangle rectangle = cCollidable.collisionBox;
-                rectangle.setPosition(cTransform.position);
+                rectangle.setPosition(cPosition.position);
 
                 float startX, startY, endX, endY;
 
@@ -131,13 +131,13 @@ public class MovementSystem extends IteratingSystem {
                     }
                 }
 
-                cTransform.position.set(rectangle.x, rectangle.y);
+                cPosition.position.set(rectangle.x, rectangle.y);
 
                 velocity.scl(1 / delta);
 
                 cRigidBody.velocity.set(velocity);
             } else {
-                cTransform.position.mulAdd(cRigidBody.velocity, delta);
+                cPosition.position.mulAdd(cRigidBody.velocity, delta);
             }
 
             if (cRigidBody.useGravity) {

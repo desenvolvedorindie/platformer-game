@@ -2,9 +2,8 @@ package com.desenvolvedorindie.platformer.network.data;
 
 public class Player {
 
-    public int id = -1;
-    public float x;
-    public float y;
+    public String name;
+    public float x, y;
     public int armId;
     public int legId;
     public int bodyId;

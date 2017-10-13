@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.desenvolvedorindie.gdxcamera.constraint.*;
 import com.desenvolvedorindie.platformer.block.Block;
 import com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent;
-import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.basic.PositionComponent;
 import com.desenvolvedorindie.platformer.utils.Debuggable;
 import com.desenvolvedorindie.platformer.world.World;
 
@@ -28,7 +28,7 @@ public class CameraSystem extends BaseSystem implements Debuggable {
     private final Vector3 playerPositionV3 = new Vector3();
 
     private ComponentMapper<CollidableComponent> mCollidable;
-    private ComponentMapper<TransformComponent> mTransform;
+    private ComponentMapper<PositionComponent> mTransform;
 
     private World gameWorld;
     private Camera camera;
@@ -59,8 +59,8 @@ public class CameraSystem extends BaseSystem implements Debuggable {
 
     @Override
     protected void processSystem() {
+        PositionComponent cPosition = mTransform.get(gameWorld.getPlayer());
         CollidableComponent cColidable = mCollidable.get(gameWorld.getPlayer());
-        TransformComponent cTransform = mTransform.get(gameWorld.getPlayer());
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
             if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
@@ -74,7 +74,7 @@ public class CameraSystem extends BaseSystem implements Debuggable {
 
         Rectangle rectangle = cColidable.collisionBox;
 
-        playerPositionV3.set(cTransform.position.x + rectangle.width / 2, cTransform.position.y + rectangle.height, 0);
+        playerPositionV3.set(cPosition.position.x + rectangle.width / 2, cPosition.position.y + rectangle.height, 0);
         cameraConstraint.update(camera, delta);
 
         if (isDebug()) {

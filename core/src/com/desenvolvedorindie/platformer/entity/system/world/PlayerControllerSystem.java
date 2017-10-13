@@ -12,7 +12,7 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.math.Vector3;
 import com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent;
-import com.desenvolvedorindie.platformer.entity.component.base.JumpComponent;
+import com.desenvolvedorindie.platformer.entity.component.physic.JumpComponent;
 import com.desenvolvedorindie.platformer.entity.component.PlayerComponent;
 import com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent;
 import com.desenvolvedorindie.platformer.input.InputSequence;

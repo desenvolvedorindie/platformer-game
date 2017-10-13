@@ -4,7 +4,8 @@ import com.artemis.Entity;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.desenvolvedorindie.platformer.entity.component.*;
-import com.desenvolvedorindie.platformer.entity.component.base.TransformComponent;
+import com.desenvolvedorindie.platformer.entity.component.basic.PositionComponent;
+import com.desenvolvedorindie.platformer.entity.component.basic.ScaleComponent;
 import com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent;
 import com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent;
 import com.desenvolvedorindie.platformer.entity.component.render.SpriterAnimationComponent;
@@ -133,12 +134,12 @@ public enum PlayerState implements State<Entity> {
     @Override
     public void update(Entity entity) {
         com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent cRigidBodyComponent = entity.getComponent(RigidBodyComponent.class);
-        com.desenvolvedorindie.platformer.entity.component.base.TransformComponent cTransform = entity.getComponent(TransformComponent.class);
+        ScaleComponent cScale = entity.getComponent(ScaleComponent.class);
 
         if (cRigidBodyComponent.velocity.x > 0) {
-            cTransform.scaleX = Math.abs(cTransform.scaleX);
+            cScale.scaleX = Math.abs(cScale.scaleX);
         } else if (cRigidBodyComponent.velocity.x < 0) {
-            cTransform.scaleX = -Math.abs(cTransform.scaleX);
+            cScale.scaleX = -Math.abs(cScale.scaleX);
         }
     }
 

@@ -1,7 +1,5 @@
 package com.desenvolvedorindie.platformer.world.chunk;
 
-import com.desenvolvedorindie.platformer.world.ChunkManager;
-
 public class Chunk {
 
     public static int CHUNK_SIZE = 50;
