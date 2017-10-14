@@ -37,15 +37,14 @@ import com.desenvolvedorindie.platformer.entity.component.basic.PositionComponen
 import com.desenvolvedorindie.platformer.entity.system.StateSystem;
 import com.desenvolvedorindie.platformer.entity.system.debug.PathFindingDebugSystem;
 import com.desenvolvedorindie.platformer.entity.system.physic.MovementSystem;
-import com.desenvolvedorindie.platformer.entity.system.render.SpriteRenderSystem;
-import com.desenvolvedorindie.platformer.entity.system.render.SpriterAnimationRenderSystem;
-import com.desenvolvedorindie.platformer.entity.system.render.TileRenderSystem;
+import com.desenvolvedorindie.platformer.entity.system.render.*;
 import com.desenvolvedorindie.platformer.entity.system.world.CameraSystem;
 import com.desenvolvedorindie.platformer.entity.system.world.DayNightCycleSystem;
 import com.desenvolvedorindie.platformer.entity.system.world.PlayerControllerSystem;
 import com.desenvolvedorindie.platformer.entity.system.world.WaterSystem;
 import com.desenvolvedorindie.platformer.network.data.Player;
 import com.desenvolvedorindie.platformer.network.data.PlayerUpdate;
+import net.fbridault.eeel.EEELPlugin;
 import net.mostlyoriginal.api.event.common.EventSystem;
 import net.mostlyoriginal.plugin.ProfilerPlugin;
 import net.namekdev.entity_tracker.EntityTracker;
@@ -87,12 +86,12 @@ public class World implements IWorld {
     private com.desenvolvedorindie.platformer.entity.system.world.WaterSystem waterSystem;
     private com.desenvolvedorindie.platformer.entity.system.render.SpriterAnimationRenderSystem spriterAnimationRenderSystem;
     private WorldSerializationManager worldSerializationManager;
-    //private com.desenvolvedorindie.platformer.entity.system.world.CameraSystem cameraSystem;
+    private com.desenvolvedorindie.platformer.entity.system.world.CameraSystem cameraSystem;
     private com.desenvolvedorindie.platformer.entity.system.debug.CollisionDebugSystem collisionDebugSystem;
     private com.desenvolvedorindie.platformer.entity.system.debug.EntityDebugSystem entityDebugSystem;
     private EntityTrackerMainWindow entityTrackerWindow;
     //Map
-    private int[][][] map = new int[CHUNK_WIDTH][CHUNK_HEIGHT][2];
+    private Block[][] foreground = new Block[CHUNK_WIDTH][CHUNK_HEIGHT], background = new Block[CHUNK_WIDTH][CHUNK_HEIGHT];
     private int heightMap[] = new int[CHUNK_WIDTH];
     private Rectangle[][] collisionBoxes = new Rectangle[CHUNK_WIDTH][CHUNK_HEIGHT];
     private Grid water = new Grid(CHUNK_WIDTH, CHUNK_HEIGHT);
@@ -119,14 +118,16 @@ public class World implements IWorld {
                         new WorldSerializationManager()
                 )
                 .with(Priority.LOW,
-                        new TileRenderSystem(this, camera, batch),
+                        new TileRenderBackgroundSystem(this, camera, batch),
+                        new TileRenderForegroundSystem(this, camera, batch),
                         new SpriteRenderSystem(camera, batch),
                         new SpriterAnimationRenderSystem(camera, batch),
+                        new LightRenderSystem(this, camera, batch),
                         new WaterSystem(this, camera, shapeRenderer),
                         new CameraSystem(this, camera, shapeRenderer)
                 );
 
-        //worldConfigBuilder.with(new EEELPlugin());
+        worldConfigBuilder.with(new EEELPlugin());
 
         if (PlatformerGame.DEBUG) {
             worldConfigBuilder.with(
@@ -190,28 +191,27 @@ public class World implements IWorld {
 
     public void regenerate() {
         Random random = new Random();
+        Block blockBackground, blockForeground;
 
         for (int x = 0; x < getWidth(); x++) {
             for (int y = 0; y < getHeight(); y++) {
-                for (int l = 0; l < getLayers(); l++) {
-                    Block block;
 
-                    if (y < getSeaLevel() - 5) {
-                        block = Blocks.OBSIDIAN;
-                    } else if (y < getSeaLevel() - 2) {
-                        block = Blocks.COBBLESTONE;
-                    } else if (y < getSeaLevel()) {
-                        block = Blocks.DIRT;
-                    } else {
-                        if (l == 0) {
-                            block = Blocks.AIR;
-                        } else {
-                            block = random.nextInt(100) > 95 ? Blocks.DIRT : Blocks.AIR;
-                        }
-                    }
-
-                    map[x][y][l] = Blocks.getIdByBlock(block);
+                if (y < getSeaLevel() - 5) {
+                    blockBackground = Blocks.OBSIDIAN;
+                    blockForeground = Blocks.OBSIDIAN;
+                } else if (y < getSeaLevel() - 2) {
+                    blockForeground = Blocks.COBBLESTONE;
+                    blockBackground = Blocks.COBBLESTONE;
+                } else if (y < getSeaLevel()) {
+                    blockForeground = Blocks.DIRT;
+                    blockBackground = Blocks.DIRT;
+                } else {
+                    blockBackground = Blocks.AIR;
+                    blockForeground = random.nextInt(100) > 95 ? Blocks.DIRT : Blocks.AIR;
                 }
+
+                background[x][y] = blockBackground;
+                foreground[x][y] = blockForeground;
             }
         }
 
@@ -221,7 +221,7 @@ public class World implements IWorld {
     private void init() {
         for (int x = 0; x < getWidth(); x++) {
             for (int y = 0; y < getHeight(); y++) {
-                collisionBoxes[x][y] = getBlock(x, y, FG).getTileRectangle(this, x, y);
+                collisionBoxes[x][y] = getForegroundBlock(x, y).getTileRectangle(this, x, y);
             }
         }
 
@@ -396,24 +396,28 @@ public class World implements IWorld {
         return pathFinder.metrics == null ? 0 : TimeUtils.nanoTime();
     }
 
-    public Block getBlock(int x, int y, int layer) {
-        return Blocks.getBlockById(map[x][y][layer]);
+    public Block getBackgroundBlock(int x, int y) {
+        return background[x][y];
     }
 
-    public Block getBlock(float x, float y, int layer) {
-        return Blocks.getBlockById(map[worldToMap(x)][worldToMap(y)][layer]);
+    public Block getForegroundBlock(int x, int y) {
+        return foreground[x][y];
     }
 
-    public void setBlock(int x, int y, int layer, Block block) {
-        map[x][y][layer] = Blocks.getIdByBlock(block);
+    public void setBackgroundBlock(int x, int y, Block block) {
+        background[x][y] = block;
+    }
+
+    public void setForegroundBlock(int x, int y, Block block) {
+        foreground[x][y] = block;
     }
 
     public int getWidth() {
-        return map.length;
+        return foreground.length;
     }
 
     public int getHeight() {
-        return map[0].length;
+        return foreground[0].length;
     }
 
     @Override
@@ -421,20 +425,12 @@ public class World implements IWorld {
         return pathMap[x][y];
     }
 
-    public int getLayers() {
-        return map[0][0].length;
-    }
-
     public int getSeaLevel() {
         return seaLevel;
     }
 
-    public boolean isSolid(float x, float y) {
-        return isSolid(worldToMap(x), worldToMap(y));
-    }
-
     public boolean isSolid(int x, int y) {
-        return isValid(x, y) && Blocks.getBlockById(map[x][y][1]).isSolid();
+        return isValid(x, y) && foreground[x][y].isSolid();
     }
 
     public boolean isValid(int x, int y) {
@@ -505,16 +501,12 @@ public class World implements IWorld {
         return null;
     }
 
-    public boolean tileCollisionAtPoint(float x, float y) {
-        return isSolid(x, y);
-    }
-
     public boolean tileCollisionAtPoints(Vector2... points) {
         boolean found = false;
 
         for (Vector2 point : points) {
             if (!found) {
-                found = tileCollisionAtPoint(point.x, point.y);
+                found = isSolid(World.worldToMap(point.x), World.worldToMap(point.y));
             }
         }
 
@@ -541,27 +533,22 @@ public class World implements IWorld {
         int width = (Integer) tiledMap.getProperties().get("width");
         int height = (Integer) tiledMap.getProperties().get("height");
 
-        map = new int[width][height][2];
+        background = new Block[width][height];
+        foreground = new Block[width][height];
 
         TiledMapTileLayer background = (TiledMapTileLayer) tiledMap.getLayers().get(NAME_BG);
         TiledMapTileLayer foreground = (TiledMapTileLayer) tiledMap.getLayers().get(NAME_FG);
 
-        TiledMapTileLayer.Cell cell;
+        TiledMapTileLayer.Cell backgroundCell, foregroundCell;
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                cell = background.getCell(x, y);
-                if (cell != null) {
-                    map[x][y][World.BG] = Blocks.getIdByName(String.valueOf(cell.getTile().getProperties().get("name")));
-                }
-            }
-        }
+                backgroundCell = background.getCell(x, y);
+                foregroundCell = foreground.getCell(x, y);
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                cell = foreground.getCell(x, y);
-                if (cell != null) {
-                    map[x][y][World.FG] = Blocks.getIdByName(String.valueOf(cell.getTile().getProperties().get("name")));
+                if (backgroundCell != null) {
+                    this.background[x][y] = Blocks.getBlockByName(String.valueOf(backgroundCell.getTile().getProperties().get("name")));
+                    this.foreground[x][y] = Blocks.getBlockByName(String.valueOf(foregroundCell.getTile().getProperties().get("name")));
                 }
             }
         }

@@ -18,11 +18,10 @@ package com.desenvolvedorindie.platformer.ai.btree.dog;
 
 import com.badlogic.gdx.ai.btree.LeafTask;
 import com.badlogic.gdx.ai.btree.Task;
-import io.piotrjastrzebski.bte.TaskComment;
 
 /** @author implicit-invocation
  * @author davebaol */
-@TaskComment("zZz for b bit")
+//@TaskComment("zZz for b bit")
 public class RestTask extends LeafTask<Dog> {
 
 	@Override

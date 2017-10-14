@@ -10,18 +10,12 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.desenvolvedorindie.platformer.PlatformerGame;
 import com.desenvolvedorindie.platformer.entity.component.basic.PositionComponent;
-import com.desenvolvedorindie.platformer.entity.component.render.SpriterAnimationComponent;
-import com.desenvolvedorindie.platformer.entity.system.render.SpriterAnimationRenderSystem;
-import com.desenvolvedorindie.platformer.entity.system.render.TileRenderSystem;
 import com.desenvolvedorindie.platformer.entity.system.world.PlayerControllerSystem;
-import com.desenvolvedorindie.platformer.graphics.Light;
 import com.desenvolvedorindie.platformer.graphics.fx.*;
 import com.desenvolvedorindie.platformer.network.GameClient;
 import com.desenvolvedorindie.platformer.network.data.Login;
@@ -49,8 +43,6 @@ public class GameScreen extends ScreenAdapter {
     private Stage stage;
     private GameHud gameHud;
     private Skin skin;
-    private Array<Light> lights = new Array<Light>();
-    private Vector3 u = new Vector3();
     private MovePlayer movePlayer;
 
     static Color randomColor() {
@@ -93,32 +85,16 @@ public class GameScreen extends ScreenAdapter {
         final Random random = new Random();
 
         InputProcessor playerInput = world.getArtemis().getSystem(PlayerControllerSystem.class).getPlayerInputAdapter();
-        Gdx.input.setInputProcessor(new InputMultiplexer(stage, playerInput, new InputAdapter() {
-
-            public boolean touchDown(int x, int y, int pointer, int button) {
-                u.set(x, y, 0);
-                camera.unproject(u);
-                Light l = new Light(u.x, u.y, randomColor(), random.nextInt(1024));
-                lights.add(l);
-                return true;
-            }
-        }));
         gameHud.setHudListener(world.getArtemis().getSystem(PlayerControllerSystem.class).getPlayerInputAdapter());
+
+        Gdx.input.setInputProcessor(new InputMultiplexer(stage, playerInput));
 
         gameEffect = new MultiTemporalVisualEffect(Format.RGBA8888, false);
         guiEffect = new MultiTemporalVisualEffect(Format.RGBA8888, false);
 
         //Draw
-        clearLights();
     }
 
-    void clearLights() {
-        for (Light light : lights) {
-            light.dispose();
-        }
-        lights.clear();
-        lights.add(new Light(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), Color.WHITE, 1024));
-    }
 
     @Override
     public void render(float delta) {
@@ -130,24 +106,6 @@ public class GameScreen extends ScreenAdapter {
         Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        u.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-        camera.unproject(u);
-
-        /*
-        // GAME
-        for (int i = 0; i < lights.size; i++) {
-            Light o = lights.get(i);
-
-            if (i == lights.size - 1) {
-                o.position.set(u.x, u.y);
-            }
-
-            renderLight(o);
-        }
-        */
-
-        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-
         batch.setShader(null);
         gameEffect.capture();
         Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -157,17 +115,6 @@ public class GameScreen extends ScreenAdapter {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         gameEffect.render(gameEffect.endCapture(), null);
 
-        Light lastLight = lights.peek();
-        // DEBUG LIGHT
-        /*
-        batch.begin();
-        batch.setShader(null);
-        batch.setColor(Color.BLACK);
-        batch.draw(lastLight.getOccluders(), 0, 0);
-        batch.setColor(Color.WHITE);
-        batch.draw(lastLight.getShadowMap1D(), 0, lastLight.getLightSize() + 5);
-        batch.end();
-
         // GUI
         guiEffect.capture();
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -176,20 +123,9 @@ public class GameScreen extends ScreenAdapter {
         stage.draw();
         Gdx.gl.glEnable(GL20.GL_BLEND);
         guiEffect.render(guiEffect.endCapture(), null);
-        */
 
         if (Gdx.input.isKeyJustPressed(Keys.N)) {
             next();
-        }
-
-        float d = 50f;
-
-        lastLight.start += Math.PI / d;
-
-        lastLight.end += Math.PI / d / 2;
-
-        if (Gdx.input.isKeyPressed(Keys.L)) {
-            clearLights();
         }
 
         if (Gdx.input.isKeyJustPressed(Keys.C) && client == null) {
@@ -209,51 +145,29 @@ public class GameScreen extends ScreenAdapter {
         }
     }
 
-    private void renderLight(Light light) {
-        int startX = Math.max(0, World.worldToMap(light.position.x - light.getLightSize() / 2f));
-        int startY = Math.max(0, World.worldToMap(light.position.y - light.getLightSize() / 2f));
-        int endX = Math.min(world.getWidth(), World.worldToMap(light.position.x + light.getLightSize() / 2f));
-        int endY = Math.min(world.getHeight(), World.worldToMap(light.position.y + light.getLightSize() / 2f));
-
-        light.startOccluder(camera, batch);
-
-        batch.setShader(null); //use default shader
-
-        batch.begin();
-        // ... draw any sprites that will cast shadows here ... //
-        world.getArtemis().getSystem(TileRenderSystem.class).renderForeground(batch, startX, startY, endX, endY);
-        world.getArtemis().getSystem(SpriterAnimationRenderSystem.class).render(world.getArtemis().getEntity(world.getPlayer()).getComponent(SpriterAnimationComponent.class).spriterAnimator);
-
-        batch.end();
-
-        light.endOccluder();
-
-        light.renderShadowMap();
-    }
-
     private void next() {
-        gameEffect.clearEffects();
+        guiEffect.clearEffects();
 
-        Gdx.app.log("Effect", String.valueOf(current));
+        Gdx.app.log("StatusEffect", String.valueOf(current));
 
         switch (current) {
             case 0:
-                gameEffect.addEffect(greyscale);
+                guiEffect.addEffect(greyscale);
                 break;
             case 1:
-                gameEffect.addEffect(invert);
+                guiEffect.addEffect(invert);
                 break;
             case 2:
-                gameEffect.addEffect(vignette);
+                guiEffect.addEffect(vignette);
                 break;
             case 3:
-                gameEffect.addEffect(emboss);
+                guiEffect.addEffect(emboss);
                 break;
             case 4:
-                gameEffect.addEffect(sepia);
+                guiEffect.addEffect(sepia);
                 break;
             case 5:
-                gameEffect.addEffect(blackAndWhite);
+                guiEffect.addEffect(blackAndWhite);
                 break;
             default:
         }

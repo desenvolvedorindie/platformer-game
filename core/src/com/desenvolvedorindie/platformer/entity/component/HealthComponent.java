@@ -3,16 +3,16 @@ package com.desenvolvedorindie.platformer.entity.component;
 import com.artemis.annotations.PooledWeaver;
 
 @PooledWeaver
-public class Health {
+public class HealthComponent {
 
     public int hp;
     public int hpMax;
 
-    public Health() {
+    public HealthComponent() {
 
     }
 
-    public Health(int startHealth) {
+    public HealthComponent(int startHealth) {
         setStartHealth(startHealth);
     }
 

@@ -21,15 +21,14 @@ import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.annotation.TaskAttribute;
 import com.badlogic.gdx.ai.utils.random.ConstantIntegerDistribution;
 import com.badlogic.gdx.ai.utils.random.IntegerDistribution;
-import io.piotrjastrzebski.bte.TaskComment;
 
 /** @author implicit-invocation
  * @author davebaol */
-@TaskComment("Dog barks # times")
+//@TaskComment("Dog barks # times")
 public class BarkTask extends LeafTask<Dog> {
 
 	@TaskAttribute
-	@TaskComment(value = "# of barks", skipFieldName = false)
+	//@TaskComment(value = "# of barks", skipFieldName = false)
 	public IntegerDistribution times = ConstantIntegerDistribution.ONE;
 
 	private int t;

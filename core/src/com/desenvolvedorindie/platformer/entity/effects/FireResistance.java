@@ -2,7 +2,11 @@ package com.desenvolvedorindie.platformer.entity.effects;
 
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
-public class FireResistance implements IBuff {
+public class FireResistance extends StatusEffect implements IBuff {
+
+    public FireResistance(float duration) {
+        super(duration);
+    }
 
     @Override
     public Drawable getIcon() {

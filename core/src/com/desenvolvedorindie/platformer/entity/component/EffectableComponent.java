@@ -6,14 +6,14 @@ import com.desenvolvedorindie.platformer.entity.effects.IStatusEffect;
 
 public class EffectableComponent extends Component {
 
-    Array<IStatusEffect> effects = new Array<IStatusEffect>();
+    public final Array<IStatusEffect> effects = new Array<IStatusEffect>();
 
-    public void addEffect(IStatusEffect statusEffect) {
-
-    }
-
-    public Array<IStatusEffect> getEffects() {
-        return effects;
+    public void clearFinished() {
+        for (int i = effects.size - 1; i >= 0; i--) {
+            if (effects.get(i).hasFinished()) {
+                effects.removeIndex(i);
+            }
+        }
     }
 
 }

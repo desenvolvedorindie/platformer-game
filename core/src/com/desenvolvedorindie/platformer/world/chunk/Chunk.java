@@ -4,7 +4,7 @@ public class Chunk {
 
     public static int CHUNK_SIZE = 50;
 
-    int[][][] blocks = new int[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
+    int[][] background = new int[CHUNK_SIZE][CHUNK_SIZE], foreground = new int[CHUNK_SIZE][CHUNK_SIZE];
 
     private float[][] lightMap = new float[CHUNK_SIZE][CHUNK_SIZE];
 

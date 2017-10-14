@@ -5,6 +5,7 @@ import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.math.Vector2;
 import com.desenvolvedorindie.platformer.entity.component.PlayerComponent;
 import com.desenvolvedorindie.platformer.entity.component.StateComponent;
+import com.desenvolvedorindie.platformer.entity.component.WalkerComponent;
 import com.desenvolvedorindie.platformer.entity.component.basic.*;
 import com.desenvolvedorindie.platformer.entity.component.physic.JumpComponent;
 import com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent;
@@ -24,29 +25,17 @@ public class EntitiesFactory {
     private Archetype playerArchetype, playerOtherArchetype;
 
     private ComponentMapper<CollidableComponent> mCollidableComponent;
-
     private ComponentMapper<JumpComponent> mJump;
-
     private ComponentMapper<PlayerComponent> mPlayer;
-
     private ComponentMapper<RigidBodyComponent> mRigiBody;
-
     private ComponentMapper<SpriteComponent> mSprite;
-
     private ComponentMapper<SpriterAnimationComponent> mSpriterAnimationComponent;
-
     private ComponentMapper<StateComponent> mState;
-
     private ComponentMapper<PositionComponent> mPosition;
-
     private ComponentMapper<OriginComponent> mOrigin;
-
     private ComponentMapper<ScaleComponent> mScale;
-
     private ComponentMapper<RotationComponent> mRotation;
-
     private ComponentMapper<TintComponent> mTint;
-
     private ComponentMapper<GFXComponent> mGFX;
 
     public EntitiesFactory(World world) {
@@ -58,6 +47,7 @@ public class EntitiesFactory {
                 .add(ScaleComponent.class)
                 .add(RotationComponent.class)
                 .add(TintComponent.class)
+                .add(WalkerComponent.class)
                 .add(SpriterAnimationComponent.class)
                 .add(StateComponent.class)
                 .add(PlayerComponent.class)

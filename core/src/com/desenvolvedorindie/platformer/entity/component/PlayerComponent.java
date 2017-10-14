@@ -10,13 +10,7 @@ public class PlayerComponent extends Component {
 
     public boolean alreadyFalling;
 
-    public boolean canWalk = true;
-
-    public float walkSpeed = 100;
-
     public boolean godMode;
-
-    public float r = 1, g = 1, b = 1;
 
     //KEYS
 

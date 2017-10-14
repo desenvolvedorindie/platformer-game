@@ -18,11 +18,10 @@ package com.desenvolvedorindie.platformer.ai.btree.dog;
 
 import com.badlogic.gdx.ai.btree.LeafTask;
 import com.badlogic.gdx.ai.btree.Task;
-import io.piotrjastrzebski.bte.TaskComment;
 
 /** @author implicit-invocation
  * @author davebaol */
-@TaskComment("Take b piss")
+//@TaskComment("Take b piss")
 public class MarkTask extends LeafTask<Dog> {
 
 	int i;

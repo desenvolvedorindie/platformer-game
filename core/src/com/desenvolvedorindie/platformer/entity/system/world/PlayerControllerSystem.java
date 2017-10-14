@@ -2,6 +2,7 @@ package com.desenvolvedorindie.platformer.entity.system.world;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
+import com.artemis.Entity;
 import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -11,9 +12,14 @@ import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.math.Vector3;
+import com.desenvolvedorindie.platformer.entity.command.Command;
+import com.desenvolvedorindie.platformer.entity.command.JumpCommand;
+import com.desenvolvedorindie.platformer.entity.command.StopWalkCommand;
+import com.desenvolvedorindie.platformer.entity.command.WalkCommand;
+import com.desenvolvedorindie.platformer.entity.component.PlayerComponent;
+import com.desenvolvedorindie.platformer.entity.component.WalkerComponent;
 import com.desenvolvedorindie.platformer.entity.component.physic.CollidableComponent;
 import com.desenvolvedorindie.platformer.entity.component.physic.JumpComponent;
-import com.desenvolvedorindie.platformer.entity.component.PlayerComponent;
 import com.desenvolvedorindie.platformer.entity.component.physic.RigidBodyComponent;
 import com.desenvolvedorindie.platformer.input.InputSequence;
 import com.desenvolvedorindie.platformer.scene2d.GameHud;
@@ -24,20 +30,29 @@ public class PlayerControllerSystem extends IteratingSystem {
     public boolean moveRight;
     public boolean moveLeft;
     public boolean jump;
+    private Command jumpCommand, stopCommand, walkLeftCommand, walkRightCommand;
     private int leftKey = Input.Keys.A, rightKey = Input.Keys.D, downKey = Input.Keys.S, upKey = Input.Keys.W, jumpKey = Input.Keys.SPACE;
     private ComponentMapper<PlayerComponent> mPlayer;
     private ComponentMapper<RigidBodyComponent> mRigidBody;
     private ComponentMapper<JumpComponent> mJump;
     private ComponentMapper<CollidableComponent> mCollidable;
-
+    private ComponentMapper<WalkerComponent> mWalker;
     private PlayerInputAdapter playerInputAdapter;
 
     public PlayerControllerSystem() {
-        super(Aspect.all(PlayerComponent.class, JumpComponent.class));
+        super(Aspect.all(
+                PlayerComponent.class,
+                JumpComponent.class
+        ));
 
         Controllers.addListener(new PlayerControllerListener());
 
         playerInputAdapter = new PlayerInputAdapter();
+
+        jumpCommand = new JumpCommand();
+        stopCommand = new StopWalkCommand();
+        walkLeftCommand = new WalkCommand(-1);
+        walkRightCommand = new WalkCommand(1);
 
         especial = new InputSequence(0.5f, new InputSequence.IInputButton[]{
                 new InputSequence.MultipleInputButton(new InputSequence.IInputButton[]{
@@ -68,10 +83,13 @@ public class PlayerControllerSystem extends IteratingSystem {
 
     @Override
     protected void process(int entityId) {
+        Entity entity = world.getEntity(entityId);
+
         PlayerComponent cPlayer = mPlayer.get(entityId);
         RigidBodyComponent cRigidBody = mRigidBody.get(entityId);
         JumpComponent cJump = mJump.get(entityId);
         CollidableComponent cCollidable = mCollidable.get(entityId);
+        WalkerComponent cWalker = mWalker.get(entityId);
 
         if (especial.process()) {
             Gdx.app.log("Sequence", "Especial");
@@ -81,13 +99,13 @@ public class PlayerControllerSystem extends IteratingSystem {
             Gdx.app.log("Sequence", "Especial 2");
         }
 
-        if (cPlayer.canWalk) {
+        if (cWalker.canWalk) {
             if (moveRight == moveLeft) {
-                cRigidBody.velocity.x = 0;
+                stopCommand.execute(entity);
             } else if (moveLeft) {
-                cRigidBody.velocity.x = -cPlayer.walkSpeed;
+                walkLeftCommand.execute(entity);
             } else if (moveRight) {
-                cRigidBody.velocity.x = cPlayer.walkSpeed;
+                walkRightCommand.execute(entity);
             }
         }
 
@@ -95,16 +113,8 @@ public class PlayerControllerSystem extends IteratingSystem {
             cRigidBody.velocity.y = Math.min(cRigidBody.velocity.y, cJump.minJumpSpeed);
         }
 
-        if (cJump.canJump && jump) {
-            if (mCollidable.has(entityId)) {
-                boolean wallJump = (cCollidable.onLeftWall || cCollidable.onRightWall) && cRigidBody.velocity.y < 0 && cJump.wallJump;
-
-                if (cCollidable.onGround || wallJump) {
-                    cRigidBody.velocity.y = cJump.jumpSpeed;
-                }
-            } else {
-                cRigidBody.velocity.y = cJump.jumpSpeed;
-            }
+        if (jump) {
+            jumpCommand.execute(entity);
         }
     }
 
@@ -144,10 +154,10 @@ public class PlayerControllerSystem extends IteratingSystem {
         @Override
         public boolean axisMoved(Controller controller, int axisCode, float value) {
             Gdx.app.log(controller.getName() + "-axis:" + axisCode, String.valueOf(value));
-            if(axisCode == 6) {
-                if(value == 1) {
+            if (axisCode == 6) {
+                if (value == 1) {
                     moveRight = true;
-                } else if(value == -1) {
+                } else if (value == -1) {
                     moveLeft = true;
                 } else {
                     moveRight = false;
