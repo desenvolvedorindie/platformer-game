@@ -101,7 +101,6 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-platform:$gdxVersion:natives-desktop"
@@ -112,12 +111,21 @@ project(":desktop") {
 project(":bte") {
     apply plugin: "java"
 
-
     dependencies {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.github.piotr-j.bte2:bte-window:$bte2Version"
+        compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+    }
+}
+
+project(":tools") {
+    apply plugin: "java"
+
+    dependencies {
+
+        compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
     }
 }
 
@@ -163,7 +171,6 @@ project(":ios") {
     }
 }
 
-
 project(":core") {
     apply plugin: "java"
 
@@ -182,9 +189,25 @@ project(":core") {
 
         doLast {
             TexturePacker.process(settings, "$inputDir/ui", "$outputDir/ui", "ui")
-            //TexturePacker.process(settings, "$inputDir/player", "$outputDir/player", "player")
-            //TexturePacker.process(settings, "$inputDir/items", "$outputDir/items", "icons")
+            TexturePacker.process(settings, "$inputDir/particles", "$outputDir/particles", "particles")
+            TexturePacker.process(settings, "$inputDir/guides", "$outputDir/ui", "guides")
         }
+    }
+
+    task deleteParticles(type: Delete) {
+        logger.info "Deleting particles..."
+
+        delete fileTree("$rootDir/android/assets/particles") {
+            include '**/*.p'
+        }
+    }
+
+    task copyParticles(type: Copy) {
+        logger.info "Copying particles..."
+
+        from "$rootDir/assets/particles"
+        into "$rootDir/android/assets/particles"
+        include "**/*.p"
     }
 
     project.tasks.compileJava.dependsOn packTextures

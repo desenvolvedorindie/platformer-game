@@ -31,7 +31,7 @@ public class LightRenderSystem extends IteratingSystem {
 
     private boolean debug = false;
 
-    private Vector3 u = new Vector3();
+    private Vector3 mouse = new Vector3();
 
     public LightRenderSystem(World gameWorld, OrthographicCamera camera, SpriteBatch batch) {
         super(Aspect.all(
@@ -48,9 +48,9 @@ public class LightRenderSystem extends IteratingSystem {
         Gdx.input.setInputProcessor(new InputMultiplexer(stage, playerInput, new InputAdapter() {
 
             public boolean touchDown(int x, int y, int pointer, int button) {
-                u.set(x, y, 0);
-                camera.unproject(u);
-                Light l = new Light(u.x, u.y, randomColor(), random.nextInt(1024));
+                mouse.set(x, y, 0);
+                camera.unproject(mouse);
+                Light l = new Light(mouse.x, mouse.y, randomColor(), random.nextInt(1024));
                 //lights.add(l);
                 return true;
             }
@@ -68,14 +68,14 @@ public class LightRenderSystem extends IteratingSystem {
 
     @Override
     protected void begin() {
-        u.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-        camera.unproject(u);
+        mouse.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+        camera.unproject(mouse);
 
         for (int i = 0; i < lights.size; i++) {
             Light o = lights.get(i);
 
             if (i == lights.size - 1) {
-                o.position.set(u.x, u.y);
+                o.position.set(mouse.x, mouse.y);
             }
 
             renderLight(o);

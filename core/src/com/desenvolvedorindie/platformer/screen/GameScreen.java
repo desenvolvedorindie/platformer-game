@@ -66,7 +66,7 @@ public class GameScreen extends ScreenAdapter {
         stage = new Stage(new FitViewport(PlatformerGame.UI_WIDTH, PlatformerGame.UI_HEIGHT, uiCamera));
         //stage.setDebugAll(PlatformerGame.DEBUG);
 
-        skin = new Skin(Assets.manager.get(Assets.ui));
+        skin = new Skin(Assets.manager.get(Assets.ATLAS_UI));
         skin.add("font-default", Assets.manager.get(Assets.FONT_HOBO_16));
         skin.load(Gdx.files.internal("ui/skin.json"));
 

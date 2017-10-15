@@ -2,10 +2,12 @@ package com.desenvolvedorindie.platformer.resource;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
+import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
 import com.badlogic.gdx.assets.loaders.ShaderProgramLoader.ShaderProgramParameter;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
@@ -48,8 +50,15 @@ public class Assets {
 
     //UI
     @Asset
-    public static final AssetDescriptor<TextureAtlas> ui = new AssetDescriptor<>("ui/ui.atlas", TextureAtlas.class);
+    public static final AssetDescriptor<TextureAtlas> ATLAS_UI = new AssetDescriptor<>("ui/ui.atlas", TextureAtlas.class);
 
+    @Asset
+    public static final AssetDescriptor<TextureAtlas> ATLAS_GUIDES = new AssetDescriptor<>("ui/guides.atlas", TextureAtlas.class);
+
+    @Asset
+    public static final AssetDescriptor<Texture> TEXTURE_SELECTION = new AssetDescriptor<Texture>("ui/selection.png", Texture.class);
+
+    //Font
     @Asset
     public static final AssetDescriptor<BitmapFont> FONT_HOBO_16 = new AssetDescriptor<>("fonts/hobo.ttf", BitmapFont.class, new FreeTypeFontLoaderParameter() {
         {
@@ -120,6 +129,14 @@ public class Assets {
     //Dungeons
     @Asset
     public static final AssetDescriptor<TiledMap> DUNGEON_WORLD = new AssetDescriptor<>("dungeons/world.tmx", TiledMap.class);
+
+    //Particles
+    @Asset
+    public static final AssetDescriptor<ParticleEffect> PARTICLE_FIRE = new AssetDescriptor<>("particles/fire.p", ParticleEffect.class, new ParticleEffectLoader.ParticleEffectParameter() {
+        {
+            atlasFile = "particles/particles.atlas";
+        }
+    });
 
     public static void load() {
         manager.setLoader(SpriterData.class, new SpriterDataLoader(manager.getFileHandleResolver()));
